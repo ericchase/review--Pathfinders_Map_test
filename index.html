@@ -1,185 +1,212 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pathfinders Interactive Map</title>
-    
+
     <!-- Link to Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    
+
     <!-- Your custom CSS -->
-    <link rel="stylesheet" href="style.css">
-    
+    <link rel="stylesheet" href="style.css" />
+
     <style>
-        /* Ensures that the map div takes up full width and height */
-        #map {
-            height: 1200px; /* Adjust map height as needed */
-            width: 100%; /* Takes up full width of the page */
-        }
+      /* Ensures that the map div takes up full width and height */
+      #map {
+        height: 1200px; /* Adjust map height as needed */
+        width: 100%; /* Takes up full width of the page */
+      }
 
-        /* Adjust the title's margin and padding */
-        h1 {
-            margin: 10px;  /* Adjust the outer space */
-            padding: 0;    /* Remove internal space */
-            text-align: center; /* Optional: Center-align the title */
-        }
+      /* Adjust the title's margin and padding */
+      h1 {
+        margin: 10px; /* Adjust the outer space */
+        padding: 0; /* Remove internal space */
+        text-align: center; /* Optional: Center-align the title */
+      }
 
-        /* Style for the legend */
-        #legend {
-            position: fixed;
-            top: 150px; /* Adjusted to give more space from the top */
-            left: 5%;
-            background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
-            padding: 10px;
-            border-radius: 10px;
-            color: white;
-            font-size: 14px;
-            z-index: 1000;
-            max-width: 250px;
-        }
+      /* Style for the legend */
+      #legend {
+        position: fixed;
+        top: 150px; /* Adjusted to give more space from the top */
+        left: 5%;
+        background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
+        padding: 10px;
+        border-radius: 10px;
+        color: white;
+        font-size: 14px;
+        z-index: 1000;
+        max-width: 250px;
+      }
 
-        #legend h3 {
-            margin: 0;
-            padding-bottom: 10px;
-        }
+      #legend h3 {
+        margin: 0;
+        padding-bottom: 10px;
+      }
 
-        #legend ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+      #legend ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
 
-        #legend li {
-            margin-bottom: 8px;
-        }
+      #legend li {
+        margin-bottom: 8px;
+      }
 
-        .legend-item, .legend-line {
-            width: 20px;
-            height: 20px;
-            display: inline-block;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
+      .legend-item,
+      .legend-line {
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        margin-right: 10px;
+        vertical-align: middle;
+      }
 
-        .legend-line {
-            width: 30px;
-            height: 5px;
-        }
-
+      .legend-line {
+        width: 30px;
+        height: 5px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <h1>Pathfinders Interactive Map</h1>
 
-<h1>Pathfinders Interactive Map</h1>
+    <!-- Div for the map -->
+    <div id="map"></div>
 
-<!-- Div for the map -->
-<div id="map"></div>
+    <div id="legend">
+      <h3>Map Legend</h3>
+      <ul>
+        <!-- Friendly Territory -->
+        <li>
+          <span class="legend-item" style="background-color: blue; opacity: 0.3"></span>
+          Friendly Territory
+        </li>
 
-<div id="legend">
-        <h3>Map Legend</h3>
-        <ul>
-            <!-- Friendly Territory -->
-            <li><span class="legend-item" style="background-color: blue; opacity: 0.3;"></span> Friendly Territory</li>
-            
-            <!-- Unconfirmed Territory -->
-            <li><span class="legend-item" style="background-color: grey; opacity: 0.3;"></span> Unconfirmed Territory</li>
-            
-            <!-- Hostile Territory -->
-            <li><span class="legend-item" style="background-color: red; opacity: 0.3;"></span> Hostile Territory</li>
-            
-            <!-- Objectives -->
-            <li><span class="legend-item" style="background-color: blue; border-radius: 50%;"></span> Objective</li>
-            <li><span class="legend-item" style="background-color: orange; border-radius: 50%;"></span> Objective</li>
-            <li><span class="legend-item" style="background-color: red; border-radius: 50%;"></span> Objective</li>
-            
-            <!-- Patrol Routes -->
-            <li><span class="legend-line" style="background-color: blue;"></span> Combat Patrol Route</li>
-            <li><span class="legend-line" style="background-color: orange;"></span> Stealth Patrol Route</li>
-            <li><span class="legend-line" style="background-color: red;"></span> Enemy Patrol Route</li>
-        </ul>
-</div>
+        <!-- Unconfirmed Territory -->
+        <li>
+          <span class="legend-item" style="background-color: grey; opacity: 0.3"></span>
+          Unconfirmed Territory
+        </li>
 
-<!-- Link to Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+        <!-- Hostile Territory -->
+        <li>
+          <span class="legend-item" style="background-color: red; opacity: 0.3"></span>
+          Hostile Territory
+        </li>
 
-<script>
-// Initialize the map
-var map = L.map('map', {
-    crs: L.CRS.Simple,
-    minZoom: -2,
-    maxZoom: 2
-});
+        <!-- Objectives -->
+        <li>
+          <span class="legend-item" style="background-color: blue; border-radius: 50%"></span>
+          Objective
+        </li>
+        <li>
+          <span class="legend-item" style="background-color: orange; border-radius: 50%"></span>
+          Objective
+        </li>
+        <li>
+          <span class="legend-item" style="background-color: red; border-radius: 50%"></span>
+          Objective
+        </li>
 
-// Define the map's image bounds
-var bounds = [[0, 0], [8000, 8000]];
+        <!-- Patrol Routes -->
+        <li>
+          <span class="legend-line" style="background-color: blue"></span>
+          Combat Patrol Route
+        </li>
+        <li>
+          <span class="legend-line" style="background-color: orange"></span>
+          Stealth Patrol Route
+        </li>
+        <li>
+          <span class="legend-line" style="background-color: red"></span>
+          Enemy Patrol Route
+        </li>
+      </ul>
+    </div>
 
-// Add the map image
-var image = L.imageOverlay('everon-map.jpg', bounds).addTo(map);
-map.fitBounds(bounds);
-map.setMaxBounds(bounds);
-map.options.maxBoundsViscosity = 1.0;
+    <!-- Link to Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
-// Create the fixed ruler container
-var rulerContainer = document.createElement('div');
-rulerContainer.id = 'ruler-container';
-rulerContainer.style.position = 'fixed';
-rulerContainer.style.top = '0'; // Keep it fixed at the top of the viewport
-rulerContainer.style.left = '0'; // Will be dynamically adjusted
-rulerContainer.style.width = '100%'; // Full width of the viewport
-rulerContainer.style.height = '56px'; // Height of the ruler
-rulerContainer.style.background = `url('coord-top.jpg') no-repeat center`;
-rulerContainer.style.backgroundSize = 'contain';
-rulerContainer.style.pointerEvents = 'none'; // Makes it unclickable
-rulerContainer.style.zIndex = '9999'; // Ensures the ruler is on top
-rulerContainer.style.borderBottom = '2px solid #fff'; // Optional: Adds a white border to the bottom
+    <script>
+      // Initialize the map
+      var map = L.map('map', {
+        crs: L.CRS.Simple,
+        minZoom: -2,
+        maxZoom: 2,
+      });
 
-// Append it to the body
-document.body.appendChild(rulerContainer);
+      // Define the map's image bounds
+      var bounds = [
+        [0, 0],
+        [8000, 8000],
+      ];
 
-// Function to update the ruler width with map zoom
-function updateRulerWidth() {
-    var zoomLevel = map.getZoom();
-    var scaleFactor = Math.pow(2, zoomLevel); // Adjust zoom level scaling
-    var mapWidthAtZoom = 8000 * scaleFactor;  // Calculate the width of the map at the current zoom level
-    rulerContainer.style.backgroundSize = `${mapWidthAtZoom}px 56px`; // Set the ruler's width to match map width
-}
+      // Add the map image
+      var image = L.imageOverlay('everon-map.jpg', bounds).addTo(map);
+      map.fitBounds(bounds);
+      map.setMaxBounds(bounds);
+      map.options.maxBoundsViscosity = 1.0;
 
-// Function to update the ruler position and width
-function updateRulerPosition() {
-    // Get the zoom level and corresponding scale factor
-    const zoomLevel = map.getZoom();
-    const scaleFactor = Math.pow(2, zoomLevel);  // Zoom scale factor
+      // Create the fixed ruler container
+      var rulerContainer = document.createElement('div');
+      rulerContainer.id = 'ruler-container';
+      rulerContainer.style.position = 'fixed';
+      rulerContainer.style.top = '0'; // Keep it fixed at the top of the viewport
+      rulerContainer.style.left = '0'; // Will be dynamically adjusted
+      rulerContainer.style.width = '100%'; // Full width of the viewport
+      rulerContainer.style.height = '56px'; // Height of the ruler
+      rulerContainer.style.background = `url('coord-top.jpg') no-repeat center`;
+      rulerContainer.style.backgroundSize = 'contain';
+      rulerContainer.style.pointerEvents = 'none'; // Makes it unclickable
+      rulerContainer.style.zIndex = '9999'; // Ensures the ruler is on top
+      rulerContainer.style.borderBottom = '2px solid #fff'; // Optional: Adds a white border to the bottom
 
-    // Calculate the map's width at the current zoom level
-    const mapWidthAtZoom = 8000 * scaleFactor; // Base width of 8000px for the map image
+      // Append it to the body
+      document.body.appendChild(rulerContainer);
 
-    // Set the ruler's background size to match the map's current width
-    rulerContainer.style.backgroundSize = `${mapWidthAtZoom}px 56px`; // Width adjusted for zoom
+      // Function to update the ruler width with map zoom
+      function updateRulerWidth() {
+        var zoomLevel = map.getZoom();
+        var scaleFactor = Math.pow(2, zoomLevel); // Adjust zoom level scaling
+        var mapWidthAtZoom = 8000 * scaleFactor; // Calculate the width of the map at the current zoom level
+        rulerContainer.style.backgroundSize = `${mapWidthAtZoom}px 56px`; // Set the ruler's width to match map width
+      }
 
-    // Calculate the offset to keep the ruler horizontally centered
-    const offsetX = (mapWidthAtZoom - map.getSize().x) / 2;  // Centering based on zoom level
+      // Function to update the ruler position and width
+      function updateRulerPosition() {
+        // Get the zoom level and corresponding scale factor
+        const zoomLevel = map.getZoom();
+        const scaleFactor = Math.pow(2, zoomLevel); // Zoom scale factor
 
-    // Align the ruler container to the center of the map's image, horizontally
-    rulerContainer.style.left = `${-offsetX}px`;
+        // Calculate the map's width at the current zoom level
+        const mapWidthAtZoom = 8000 * scaleFactor; // Base width of 8000px for the map image
 
-    // Keep the vertical position fixed at the top of the viewport
-    rulerContainer.style.top = '0';
-}
+        // Set the ruler's background size to match the map's current width
+        rulerContainer.style.backgroundSize = `${mapWidthAtZoom}px 56px`; // Width adjusted for zoom
 
-// Attach events to update ruler position/width
-map.on('moveend', () => {
-    updateRulerPosition();
-});
+        // Calculate the offset to keep the ruler horizontally centered
+        const offsetX = (mapWidthAtZoom - map.getSize().x) / 2; // Centering based on zoom level
 
-map.on('zoomend', () => {
-    updateRulerPosition();
-});
+        // Align the ruler container to the center of the map's image, horizontally
+        rulerContainer.style.left = `${-offsetX}px`;
 
-// Initialize ruler adjustments
-updateRulerPosition();
+        // Keep the vertical position fixed at the top of the viewport
+        rulerContainer.style.top = '0';
+      }
 
-</script>
+      // Attach events to update ruler position/width
+      map.on('moveend', () => {
+        updateRulerPosition();
+      });
 
-</body>
+      map.on('zoomend', () => {
+        updateRulerPosition();
+      });
+
+      // Initialize ruler adjustments
+      updateRulerPosition();
+    </script>
+  </body>
 </html>
