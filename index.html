@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pathfinders Interactive Map</title>
 
-    <link rel="stylesheet" href="./leaflet@1.7.1.css" />
+    <link rel="stylesheet" href="./leaflet@1.9.4.css" />
     <link rel="stylesheet" href="./style.css" />
     <link rel="stylesheet" href="./map.css" />
 
-    <script src="./leaflet@1.7.1.js"></script>
+    <script src="./leaflet@1.9.4.js"></script>
     <script src="./map.js" type="module"></script>
   </head>
   <body>
@@ -100,15 +100,17 @@
       map.setMaxBounds(bounds);
 
       // create an icon if you want
-      const greenIcon = L.icon({
-        iconUrl: './crosshair.png',
-        iconSize: [75, 75], // size of the icon
-        iconAnchor: [37.5, 37.5], // point of the icon which will correspond to marker's location
-        popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
-      });
+      // const greenIcon = L.icon({
+      //   iconUrl: './crosshair.png',
+      //   iconSize: [75, 75], // size of the icon
+      //   iconAnchor: [37.5, 37.5], // point of the icon which will correspond to marker's location
+      //   popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
+      // });
 
       // add a marker
-      L.marker([100, 100], { icon: greenIcon }).addTo(map);
+      // L.marker([100, 100], { icon: greenIcon }).addTo(map);
+      
+      L.marker([100, 100]).addTo(map);
     </script>
   </body>
 </html>
