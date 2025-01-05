@@ -7,6 +7,8 @@ const legend = document.getElementById('legend');
 const MAP_WIDTH = 8000;
 const MAP_HEIGHT = 8000;
 
+const START_ZOOM = 0.3;
+
 const ZOOM_MIN = 0.1;
 const ZOOM_MAX = 2.0;
 const ZOOM_MULT = 0.05;
@@ -16,10 +18,11 @@ let isDragging = false;
 let startX = 0;
 let startY = 0;
 
+// used for window resize event
 let oldMapContainerRect = mapContainer.getBoundingClientRect();
 
 setTimeout(() => {
-  setTransform({ x: 0, y: 0, scale: 0.1 });
+  setTransform({ x: 0, y: 0, scale: START_ZOOM });
   centerMapOnMapContainer();
   oldMapContainerRect = mapContainer.getBoundingClientRect();
 }, 250);
@@ -34,13 +37,16 @@ mapContainer.addEventListener('pointerdown', (event) => {
 
 // When the pointer moves
 document.addEventListener('pointermove', (event) => {
+  console.log('mouse', { x: event.clientX, y: event.clientY });
+  console.log('map:', mouseCoordinatesToMapCoordinates(event.clientX, event.clientY));
+
   if (isDragging) {
-    const { x, y } = parseTransform(map);
+    const { x, y, scale } = parseTransform(map);
 
     const moveX = event.clientX - startX;
     const moveY = event.clientY - startY;
 
-    setTransform({ x: x + moveX, y: y + moveY });
+    setTransform({ x: x + moveX, y: y + moveY, scale });
 
     startX = event.clientX;
     startY = event.clientY;
@@ -97,11 +103,11 @@ window.addEventListener('resize', () => {
   const new_distance_x = 0.5 * newMapContainerRect.width;
   const new_distance_y = 0.5 * newMapContainerRect.height;
 
-  const { x, y } = parseTransform(map);
+  const { x, y, scale } = parseTransform(map);
   const x_distance = new_distance_x - (old_distance_x - x);
   const y_distance = new_distance_y - (old_distance_y - y);
 
-  setTransform({ x: x_distance, y: y_distance });
+  setTransform({ x: x_distance, y: y_distance, scale });
 
   oldMapContainerRect = newMapContainerRect;
 });
@@ -135,23 +141,30 @@ function parseTransform(element) {
   return values;
 }
 
-/** @param {{ scale?: number, x?: number, y?: number }} params */
+/** @param {{ scale: number, x: number, y: number }} params */
 function setTransform({ scale, x, y }) {
-  if (typeof scale === 'number') {
-    map.style.transform = `scale(${scale})`;
-    hruler.style.height = `${scale * 56}px`;
-    vruler.style.width = `${scale * 56}px`;
-    legend.style.top = `${60 + scale * 56}px`;
-    legend.style.left = `${10 + scale * 56}px`;
-  }
-  if (typeof x === 'number') {
-    map.style.left = `${x}px`;
-    hruler.style.transform = `translate(${x}px)`;
-  }
-  if (typeof y === 'number') {
-    map.style.top = `${y}px`;
-    vruler.style.transform = `translate(0, ${y}px)`;
-  }
+  // Scale
+  map.style.transform = `scale(${scale})`;
+  hruler.style.height = `${scale * 56}px`;
+  vruler.style.width = `${scale * 56}px`;
+  legend.style.top = `${60 + scale * 56}px`;
+  legend.style.left = `${10 + scale * 56}px`;
+
+  // X
+  map.style.left = `${x}px`;
+  hruler.style.transform = `translate(${x}px)`;
+
+  // Y
+  const container = mapContainer.getBoundingClientRect();
+  const hruler_height = Number.parseFloat(hruler.style.height);
+  console.log(hruler_height);
+  // clamp top
+  y = Math.min(y, hruler_height);
+  // clamp bottom
+  console.log(window.innerHeight, container.height, container.top, MAP_HEIGHT * scale);
+  // y = Math.max(y, container.height + container.top - MAP_HEIGHT * scale);
+  map.style.top = `${y}px`;
+  vruler.style.transform = `translate(0, ${y}px)`;
 }
 
 // Map Container Coordinate Conversions
@@ -189,5 +202,14 @@ function percentagesToMapCoordinates(px, py) {
 function centerMapOnMapContainer() {
   const containerCenter = percentagesToMapContainerCoordinates(0.5, 0.5);
   const mapCenter = percentagesToMapCoordinates(0.5, 0.5);
-  setTransform({ x: containerCenter.x - mapCenter.x, y: containerCenter.y - mapCenter.y });
+  const { scale } = parseTransform(map);
+  setTransform({ x: containerCenter.x - mapCenter.x, y: containerCenter.y - mapCenter.y, scale });
+}
+
+function mouseCoordinatesToMapCoordinates(mouse_x, mouse_y) {
+  const { x, y, scale } = parseTransform(map);
+  return {
+    x: mouse_x - x / scale,
+    y: mouse_y - y / scale,
+  };
 }
