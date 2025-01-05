@@ -1,0 +1,98 @@
+/* General body styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    color: #333;  /* Dark text color for readability */
+}
+
+/* Style for the heading (title) */
+h1 {
+    color: #fff;                              /* White text */
+    text-align: center;                        /* Center align the title */
+    margin-top: 20px;                          /* Reduce space above the title */
+    padding: 10px 30px;                        /* Smaller padding around the title */
+    background-color: #3E4A36;                 /* Darker olive-camo color */
+    border-radius: 5px;                        /* Rounded corners for the background */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Subtle shadow for depth */
+    font-size: 1.8em;                          /* Smaller font size */
+    text-transform: uppercase;                 /* Uppercase text for a bolder look */
+    letter-spacing: 1px;                       /* Spacing between letters for clarity */
+}
+
+/* Responsive adjustments for smaller screens */
+@media screen and (max-width: 768px) {
+    h1 {
+        font-size: 1.5em;  /* Smaller font size on mobile */
+        padding: 8px 20px; /* Adjust padding for smaller screens */
+    }
+}
+
+/* Style for the map container */
+#map {
+    height: 600px; /* Map height */
+    width: 100%;   /* Full width of the page */
+    border-top: 3px solid #333;  /* Add a border at the top of the map for style */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Add subtle shadow around the map */
+}
+
+/* Additional styles for paragraphs or any text (if needed) */
+p {
+    font-size: 18px;
+    color: #555;  /* Light gray text color for content */
+    text-align: center;
+    margin-top: 20px; /* Space below title */
+    line-height: 1.6;  /* Increased line height for readability */
+}
+
+
+/* Style for the legend */
+#legend {
+    position: fixed;
+    top: 150px;
+    left: 5%;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+    font-size: 14px;
+    z-index: 1000;
+    max-width: 250px;
+}
+
+#legend h3 {
+    margin: 0;
+    padding-bottom: 10px;
+}
+
+#legend ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#legend li {
+    margin-bottom: 8px;
+}
+
+.legend-item {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%; /* Circle shape */
+    display: inline-block;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.legend-line {
+    width: 30px;
+    height: 5px;
+    display: inline-block;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+
+
+
