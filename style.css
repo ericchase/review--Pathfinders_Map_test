@@ -31,7 +31,7 @@ h1 {
 
 /* Style for the map container */
 #map {
-  height: 600px; /* Map height */
+  height: 100%; /* Map height */
   width: 100%; /* Full width of the page */
   border-top: 3px solid #333; /* Add a border at the top of the map for style */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Add subtle shadow around the map */

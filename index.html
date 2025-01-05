@@ -12,12 +12,6 @@
     <link rel="stylesheet" href="style.css" />
 
     <style>
-      /* Ensures that the map div takes up full width and height */
-      #map {
-        height: 1200px; /* Adjust map height as needed */
-        width: 100%; /* Takes up full width of the page */
-      }
-
       /* Adjust the title's margin and padding */
       h1 {
         margin: 10px; /* Adjust the outer space */
@@ -68,9 +62,25 @@
         height: 5px;
       }
     </style>
+
+    <style>
+      html,
+      body {
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+      }
+      #ruler-container {
+        /* border-bottom: 2px solid #fff; */
+        line-height: 0;
+        pointer-events: none;
+        z-index: 9999;
+      }
+    </style>
   </head>
   <body>
     <h1>Pathfinders Interactive Map</h1>
+    <div id="ruler-container"><img src="coord-top.jpg" /></div>
 
     <!-- Div for the map -->
     <div id="map"></div>
@@ -138,40 +148,25 @@
       });
 
       // Define the map's image bounds
-      var bounds = [
+      const bounds = [
         [0, 0],
         [8000, 8000],
       ];
 
       // Add the map image
-      var image = L.imageOverlay('everon-map.jpg', bounds).addTo(map);
+      const image = L.imageOverlay('everon-map.jpg', bounds).addTo(map);
       map.fitBounds(bounds);
       map.setMaxBounds(bounds);
-      map.options.maxBoundsViscosity = 1.0;
 
-      // Create the fixed ruler container
-      var rulerContainer = document.createElement('div');
-      rulerContainer.id = 'ruler-container';
-      rulerContainer.style.position = 'fixed';
-      rulerContainer.style.top = '0'; // Keep it fixed at the top of the viewport
-      rulerContainer.style.left = '0'; // Will be dynamically adjusted
-      rulerContainer.style.width = '100%'; // Full width of the viewport
-      rulerContainer.style.height = '56px'; // Height of the ruler
-      rulerContainer.style.background = `url('coord-top.jpg') no-repeat center`;
-      rulerContainer.style.backgroundSize = 'contain';
-      rulerContainer.style.pointerEvents = 'none'; // Makes it unclickable
-      rulerContainer.style.zIndex = '9999'; // Ensures the ruler is on top
-      rulerContainer.style.borderBottom = '2px solid #fff'; // Optional: Adds a white border to the bottom
-
-      // Append it to the body
-      document.body.appendChild(rulerContainer);
+      // Get reference to the ruler container
+      const rulerContainer = document.getElementById('ruler-container');
 
       // Function to update the ruler width with map zoom
       function updateRulerWidth() {
-        var zoomLevel = map.getZoom();
-        var scaleFactor = Math.pow(2, zoomLevel); // Adjust zoom level scaling
-        var mapWidthAtZoom = 8000 * scaleFactor; // Calculate the width of the map at the current zoom level
-        rulerContainer.style.backgroundSize = `${mapWidthAtZoom}px 56px`; // Set the ruler's width to match map width
+        const zoomLevel = map.getZoom();
+        const scaleFactor = Math.pow(2, zoomLevel); // Adjust zoom level scaling
+        const mapWidthAtZoom = 8000 * scaleFactor; // Calculate the width of the map at the current zoom level
+        //rulerContainer.style.backgroundSize = `${mapWidthAtZoom}px 56px`; // Set the ruler's width to match map width
       }
 
       // Function to update the ruler position and width
@@ -184,16 +179,16 @@
         const mapWidthAtZoom = 8000 * scaleFactor; // Base width of 8000px for the map image
 
         // Set the ruler's background size to match the map's current width
-        rulerContainer.style.backgroundSize = `${mapWidthAtZoom}px 56px`; // Width adjusted for zoom
+        //rulerContainer.style.backgroundSize = `${mapWidthAtZoom}px 56px`; // Width adjusted for zoom
 
         // Calculate the offset to keep the ruler horizontally centered
         const offsetX = (mapWidthAtZoom - map.getSize().x) / 2; // Centering based on zoom level
 
         // Align the ruler container to the center of the map's image, horizontally
-        rulerContainer.style.left = `${-offsetX}px`;
+        //rulerContainer.style.left = `${-offsetX}px`;
 
         // Keep the vertical position fixed at the top of the viewport
-        rulerContainer.style.top = '0';
+        //rulerContainer.style.top = '0';
       }
 
       // Attach events to update ruler position/width
