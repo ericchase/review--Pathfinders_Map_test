@@ -28,9 +28,8 @@
   flex: 1;
   line-height: 0;
   overflow: hidden;
-  position: relative; /* Make the container the reference point for absolute positioning */
+  position: relative;
 }
-/* Style for the map container */
 #map {
   position: absolute;
   bottom: 0;

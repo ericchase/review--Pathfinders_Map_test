@@ -16,11 +16,11 @@
     <div id="body-flex-column">
       <h1>Pathfinders Interactive Map</h1>
       <!-- Horizontal Ruler -->
-      <div id="h-ruler-container"><img id="h-ruler" src="coord-top.jpg" /></div>
+      <div id="h-ruler-container"><img id="h-ruler" src="./coord-top.jpg" /></div>
       <!-- Div for the map -->
       <div id="map-container">
         <!-- Vertical Ruler -->
-        <div id="v-ruler-container"><img id="v-ruler" src="coord-left.jpg" /></div>
+        <div id="v-ruler-container"><img id="v-ruler" src="./coord-left.jpg" /></div>
         <div id="map"></div>
       </div>
     </div>
@@ -95,14 +95,14 @@
 
       map.setView([0, 0], 1);
 
-      L.imageOverlay('everon-map.jpg', bounds).addTo(map);
+      L.imageOverlay('./everon-map.jpg', bounds).addTo(map);
       map.fitBounds(bounds);
       map.setMaxBounds(bounds);
 
       // create an icon if you want
       const greenIcon = L.icon({
-        iconUrl: 'leaf-green.png',
-        shadowUrl: 'leaf-shadow.png',
+        iconUrl: './leaf-green.png',
+        shadowUrl: './leaf-shadow.png',
 
         iconSize: [38, 95], // size of the icon
         shadowSize: [50, 64], // size of the shadow
