@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="./index.css" />
+    <script src="./index.js" type="module"></script>
+  </head>
+  <body>
+    <div class="zoom-container" id="map-container">
+      <div class="zoom-child" id="map">
+        <img src="./image/everon-map.jpg" alt="image" />
+      </div>
+      <div class="ruler-container-v" id="ruler-container-v"><img class="ruler-v" id="ruler-v" src="./image/ruler-v.jpg" /></div>
+      <div class="ruler-container-h" id="ruler-container-h"><img class="ruler-h" id="ruler-h" src="./image/ruler-h.jpg" /></div>
+    </div>
+
+    <div id="legend">
+      <h3>Map Legend</h3>
+      <ul>
+        <!-- Friendly Territory -->
+        <li>
+          <span class="legend-item" style="background-color: blue; opacity: 0.3"></span>
+          Friendly Territory
+        </li>
+        <!-- Unconfirmed Territory -->
+        <li>
+          <span class="legend-item" style="background-color: grey; opacity: 0.3"></span>
+          Unconfirmed Territory
+        </li>
+        <!-- Hostile Territory -->
+        <li>
+          <span class="legend-item" style="background-color: red; opacity: 0.3"></span>
+          Hostile Territory
+        </li>
+        <!-- Objectives -->
+        <li>
+          <span class="legend-item rounded" style="background-color: blue"></span>
+          Objective
+        </li>
+        <li>
+          <span class="legend-item rounded" style="background-color: orange"></span>
+          Objective
+        </li>
+        <li>
+          <span class="legend-item rounded" style="background-color: red"></span>
+          Objective
+        </li>
+        <!-- Patrol Routes -->
+        <li>
+          <span class="legend-line" style="background-color: blue"></span>
+          Combat Patrol Route
+        </li>
+        <li>
+          <span class="legend-line" style="background-color: orange"></span>
+          Stealth Patrol Route
+        </li>
+        <li>
+          <span class="legend-line" style="background-color: red"></span>
+          Enemy Patrol Route
+        </li>
+      </ul>
+    </div>
+  </body>
+</html>

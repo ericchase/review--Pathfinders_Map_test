@@ -1,0 +1,11 @@
+.zoom-container {
+  line-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+.zoom-child {
+  pointer-events: none;
+  position: absolute;
+  transform-origin: top left;
+  user-select: none;
+}

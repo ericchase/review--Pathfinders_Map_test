@@ -1,0 +1,35 @@
+.ruler-container-h {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.ruler-container-v {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.ruler-h {
+  position: absolute;
+  transform-origin: top left;
+}
+.ruler-v {
+  position: absolute;
+  transform-origin: top left;
+}
+
+#ruler-h {
+  clip-path: inset(0 222px 0 220px);
+  overflow: hidden;
+  /* add a nice border */
+  padding-bottom: 2px;
+  background-color: black;
+}
+
+#ruler-v {
+  clip-path: inset(500px 0 220px 0);
+  overflow: hidden;
+  /* add a nice border */
+  padding-right: 2px;
+  background-color: black;
+}
