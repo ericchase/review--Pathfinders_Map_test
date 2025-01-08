@@ -161,15 +161,17 @@ export class ZoomController {
     const x = this.parse_x();
     const y = this.parse_y();
 
+    const new_scale_clamped = Math.min(this.options.zoom_max, Math.max(new_scale, this.options.zoom_min));
+
     // current point > child point > scaled child point > scaled point
     const child_point = this.coordinateSpace.globalPointToChildPoint(this.child, point);
-    const child_point_scaled = scalePoint(new_scale / scale, child_point);
+    const child_point_scaled = scalePoint(new_scale_clamped / scale, child_point);
     const point_scaled = this.coordinateSpace.childPointToGlobalPoint(this.child, child_point_scaled);
 
     // delta from scaled point to current point
     const delta_point = getDelta(point_scaled, point);
 
-    this.setTransform(new_scale, toPoint(x + delta_point.x, y + delta_point.y));
+    this.setTransform(new_scale_clamped, toPoint(x + delta_point.x, y + delta_point.y));
   }
 
   /**
@@ -241,58 +243,111 @@ export class ZoomController {
  */
 function SetupZoomControl(controller) {
   let isDragging = false;
-  let dragStart = toPoint(0, 0);
   let oldContainerRect = controller.container.getBoundingClientRect();
 
   controller.setTransform(1, toPoint(0, 0));
 
-  let activeTouches = new Set();
+  let dragStart = toPoint(0, 0);
+  let pinchStart = 0;
+
+  /**
+   * @type {Map<number,{clientX:number, clientY:number}>}
+   */
+  const pointers = new Map();
+
+  function getPinchCenter() {
+    const [pointer1, pointer2] = [...pointers.values()];
+    // Calculate the center point between the two pointers
+    const x = (pointer1.clientX + pointer2.clientX) / 2;
+    const y = (pointer1.clientY + pointer2.clientY) / 2;
+    return toPoint(x, y);
+  }
+  function getPinchDistance() {
+    const [pointer1, pointer2] = [...pointers.values()];
+    // Calculate the distance between the two pointers (pinch distance)
+    const dx = pointer2.clientX - pointer1.clientX;
+    const dy = pointer2.clientY - pointer1.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
 
   controller.container.addEventListener('pointerdown', (event) => {
-    if (event.pointerType === 'touch') {
-      activeTouches.add(event.pointerId);
+    pointers.set(event.pointerId, { clientX: event.clientX, clientY: event.clientY });
+
+    if (event.pointerType === 'mouse') {
+      switch (event.button) {
+        case 1:
+          // middle click
+          // center on point
+          controller.moveDelta(controller.coordinateSpace.deltaGlobalPointToContainerCenter(toPoint(event.clientX, event.clientY)));
+          return;
+        case 2:
+          // right click
+          // do nothing
+          isDragging = false;
+          return;
+      }
     }
-    if (event.button === 1) {
-      // middle click
-      controller.moveDelta(controller.coordinateSpace.deltaGlobalPointToContainerCenter(toPoint(event.clientX, event.clientY)));
-    } else if (event.button === 2) {
-      // right click
-    } else {
-      isDragging = true;
-      dragStart = toPoint(event.clientX, event.clientY);
-      controller.child.setPointerCapture(event.pointerId);
+
+    switch (pointers.size) {
+      case 1:
+        isDragging = true;
+        dragStart = toPoint(event.clientX, event.clientY);
+        controller.child.setPointerCapture(event.pointerId);
+        break;
+      case 2:
+        pinchStart = getPinchDistance();
+        break;
+    }
+  });
+
+  controller.container.addEventListener('pointermove', (event) => {
+    pointers.set(event.pointerId, { clientX: event.clientX, clientY: event.clientY });
+
+    switch (pointers.size) {
+      case 1:
+        if (isDragging) {
+          const dragDistance = toPoint(event.clientX, event.clientY);
+          controller.moveDelta(getDelta(dragStart, dragDistance));
+          dragStart = dragDistance;
+        }
+        break;
+      case 2:
+        {
+          event.preventDefault(); // disable default pinch-to-zoom
+          const pinchDistance = getPinchDistance();
+          const deltaPinch = pinchDistance - pinchStart;
+          if (deltaPinch < -1 || deltaPinch > 1) {
+            fetch(`http://192.168.0.78:8000/${deltaPinch}`);
+            // if (deltaPinch > 0.1 || deltaPinch < -0.1) {
+            const targetScale = controller.parse_scale() + deltaPinch / 100;
+            controller.zoomTo(targetScale, getPinchCenter());
+            // }
+          }
+          pinchStart = getPinchDistance();
+        }
+        break;
     }
   });
 
   controller.container.addEventListener('pointerup', (event) => {
+    pointers.delete(event.pointerId);
     isDragging = false;
-    //   if (event.pointerType === 'touch') {
-    activeTouches.delete(event.pointerId);
-    //   }
   });
 
   controller.container.addEventListener('pointercancel', (event) => {
+    pointers.delete(event.pointerId);
     isDragging = false;
-    activeTouches.delete(event.pointerId);
   });
 
+  controller.container.addEventListener('contextmenu', (event) => {
+    event.preventDefault();
+  });
   controller.container.addEventListener('wheel', (event) => {
     event.preventDefault();
     if (event.deltaY < 0) {
       controller.zoomIn(toPoint(event.clientX, event.clientY));
-    } else {
+    } else if (event.deltaY > 0) {
       controller.zoomOut(toPoint(event.clientX, event.clientY));
-    }
-  });
-
-  document.addEventListener('pointermove', (event) => {
-    if (activeTouches.size > 1) {
-      event.preventDefault(); // disable pinch-to-zoom
-    } else {
-      if (isDragging) {
-        controller.moveDelta(getDelta(dragStart, toPoint(event.clientX, event.clientY)));
-        dragStart = toPoint(event.clientX, event.clientY);
-      }
     }
   });
 
