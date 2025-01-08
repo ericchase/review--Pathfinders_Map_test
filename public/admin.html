@@ -6,6 +6,7 @@
     <title>Document</title>
     <link rel="stylesheet" href="./index.css" />
     <script src="./index.js" type="module"></script>
+    <script src="./marker-editor.js" type="module"></script>
   </head>
   <body>
     <div class="zoom-container" id="map-container">
@@ -19,10 +20,22 @@
       </svg>
     </div>
 
+    <div id="marker-editor">
+      <label for="">
+        x
+        <input id="x" type="text" />
+      </label>
+      <label for="">
+        y
+        <input id="y" type="text" />
+      </label>
+      <label for="">
+        r
+        <input id="r" type="text" />
+      </label>
+    </div>
+
     <div id="legend">
-      <button id="toggle-legend">
-        <div></div>
-      </button>
       <h3>Map Legend</h3>
       <ul>
         <!-- Friendly Territory -->

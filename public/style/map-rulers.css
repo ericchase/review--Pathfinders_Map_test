@@ -22,6 +22,7 @@
   /* add a nice border */
   padding-bottom: 2px;
   background-color: black;
+  /* max-height: 1em; */
 }
 
 #ruler-v {
@@ -30,4 +31,5 @@
   /* add a nice border */
   padding-right: 2px;
   background-color: black;
+  /* max-width: 1em; */
 }

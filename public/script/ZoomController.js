@@ -318,7 +318,7 @@ function SetupZoomControl(controller) {
           const deltaPinch = pinchDistance - pinchStart;
           if (deltaPinch < -1 || deltaPinch > 1) {
             // use the delta pinch distance to zoom
-            controller.zoomTo(controller.parse_scale() + deltaPinch / 100, getPinchCenter());
+            controller.zoomTo(controller.parse_scale() + deltaPinch / 500, getPinchCenter());
           }
           pinchStart = getPinchDistance();
         }

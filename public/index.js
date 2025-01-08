@@ -1,8 +1,14 @@
+import { toInt, toPoint } from './script/CoordinateSpaceContainer.js';
 import { NodeRef } from './script/lib/Node_Utility.js';
 import { ZoomController } from './script/ZoomController.js';
 
-const container = document.getElementById('map-container');
 const child = document.getElementById('map');
+const container = document.getElementById('map-container');
+const legend = NodeRef(document.getElementById('legend')).as(HTMLElement);
+const toggle_legend = NodeRef(document.getElementById('toggle-legend')).as(HTMLButtonElement);
+const marker_container = NodeRef(document.getElementById('marker-container')).as(SVGElement);
+const ruler_h = NodeRef(document.getElementById('ruler-h')).as(HTMLElement);
+const ruler_v = NodeRef(document.getElementById('ruler-v')).as(HTMLElement);
 
 // custom curve function for smooth zooming
 function zoomCurve(scale) {
@@ -17,55 +23,44 @@ function zoomCurve(scale) {
 
 const zoomController = new ZoomController(container, child, {
   enable_edge_clamping: false,
+  zoom_min: 0.05,
   zoom_max: 4,
   zoom_delta_function: zoomCurve,
 });
 
-// update the floating rulers
-const ruler_h = NodeRef(document.getElementById('ruler-h')).as(HTMLElement);
-const ruler_v = NodeRef(document.getElementById('ruler-v')).as(HTMLElement);
-const legend = NodeRef(document.getElementById('legend')).as(HTMLElement);
-const marker_container = NodeRef(document.getElementById('marker-container')).as(SVGElement);
-
+// update other elements on drag and zoom
 zoomController.onTransform((scale, point) => {
-  ruler_h.style.left = `${point.x}px`;
-  ruler_h.style.transform = `scale(${scale})`;
-
-  ruler_v.style.top = `${point.y}px`;
-  ruler_v.style.transform = `scale(${scale})`;
-
-  legend.style.left = `${10 + ruler_v.getBoundingClientRect().width}px`;
-  legend.style.top = `${10 + ruler_h.getBoundingClientRect().height}px`;
-
+  // move and scale the marker container
   marker_container.style.left = `${point.x}px`;
   marker_container.style.top = `${point.y}px`;
   marker_container.style.transform = `scale(${scale})`;
+
+  const secondary_scale = Math.min(scale, 0.5);
+
+  // move and scale the rulers
+  ruler_h.style.left = `${point.x}px`;
+  ruler_h.style.transform = `scale(${scale},${secondary_scale})`;
+  ruler_v.style.top = `${point.y}px`;
+  ruler_v.style.transform = `scale(${secondary_scale},${scale})`;
+
+  // move the legend to clear the rulers
+  legend.style.left = `${10 + ruler_v.getBoundingClientRect().width}px`;
+  legend.style.top = `${10 + ruler_h.getBoundingClientRect().height}px`;
 });
 
+// initialize the controller
 zoomController.init();
-// zoomController.setScale(1);
-// zoomController.centerChild();
-// zoomController.setPosition(toPoint(zoomController.parse_x(), 10));
+zoomController.setScale(0.1);
+zoomController.centerChild();
+zoomController.setPosition(toPoint(zoomController.parse_x(), 10));
 
-// marker editor
-const marker_x = NodeRef(document.querySelector('#marker-editor #x')).as(HTMLInputElement);
-const marker_y = NodeRef(document.querySelector('#marker-editor #y')).as(HTMLInputElement);
-const marker_r = NodeRef(document.querySelector('#marker-editor #r')).as(HTMLInputElement);
-
-const marker_1 = NodeRef(document.getElementById('marker-1')).as(SVGCircleElement);
-
-marker_x.addEventListener('input', () => {
-  if (Number.isNaN(Number.parseFloat(marker_x.value)) === false) {
-    marker_1.setAttribute('cx', marker_x.value);
-  }
-});
-marker_y.addEventListener('input', () => {
-  if (Number.isNaN(Number.parseFloat(marker_y.value)) === false) {
-    marker_1.setAttribute('cy', marker_y.value);
-  }
-});
-marker_r.addEventListener('input', () => {
-  if (Number.isNaN(Number.parseFloat(marker_r.value)) === false) {
-    marker_1.setAttribute('r', marker_r.value);
+// toggle legend contents
+toggle_legend.addEventListener('click', () => {
+  if (toInt(legend.style.height, 0) === 1) {
+    legend.style.removeProperty('height');
+    legend.style.removeProperty('overflow');
+  } else {
+    legend.style.height = '1em';
+    legend.style.overflow = 'hidden';
   }
 });
