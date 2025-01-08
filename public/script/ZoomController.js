@@ -317,11 +317,8 @@ function SetupZoomControl(controller) {
           const pinchDistance = getPinchDistance();
           const deltaPinch = pinchDistance - pinchStart;
           if (deltaPinch < -1 || deltaPinch > 1) {
-            fetch(`http://192.168.0.78:8000/${deltaPinch}`);
-            // if (deltaPinch > 0.1 || deltaPinch < -0.1) {
-            const targetScale = controller.parse_scale() + deltaPinch / 100;
-            controller.zoomTo(targetScale, getPinchCenter());
-            // }
+            // use the delta pinch distance to zoom
+            controller.zoomTo(controller.parse_scale() + deltaPinch / 100, getPinchCenter());
           }
           pinchStart = getPinchDistance();
         }

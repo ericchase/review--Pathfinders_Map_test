@@ -5,14 +5,14 @@ const container = document.getElementById('map-container');
 const child = document.getElementById('map');
 
 // custom curve function for smooth zooming
-function zoomCurve(value) {
+function zoomCurve(scale) {
   const exponential_base = 1 / 2;
   const input_min = 0.1;
   const input_max = 2;
   const output_min = 0.01;
   const output_max = 0.5;
   const EB_IM = Math.pow(exponential_base, input_min);
-  return Math.max(output_min, output_min + ((output_max - output_min) * (Math.pow(exponential_base, value) - EB_IM)) / (Math.pow(exponential_base, input_max) - EB_IM));
+  return Math.max(output_min, output_min + ((output_max - output_min) * (Math.pow(exponential_base, scale) - EB_IM)) / (Math.pow(exponential_base, input_max) - EB_IM));
 }
 
 const zoomController = new ZoomController(container, child, {
