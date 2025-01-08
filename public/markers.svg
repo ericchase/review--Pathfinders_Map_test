@@ -1,1 +1,2 @@
 <circle id="marker-1" cx="1850" cy="6750" r="500" stroke="blue" stroke-opacity="1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="blue" fill-opacity="0.2" />
+<polygon id="nevada" points="385,860 6800,680 7230,7700 5250,7750 650,5350" stroke="red" stroke-opacity="1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="red" fill-opacity="0.3" />
