@@ -1,5 +1,6 @@
 @import url('./style/basic.css');
 @import url('./style/map.css');
-@import url('./style/map-legend.css');
-@import url('./style/map-ruler.css');
+@import url('./style/map-legends.css');
+@import url('./style/map-markers.css');
+@import url('./style/map-rulers.css');
 @import url('./style/zoom-container.css');

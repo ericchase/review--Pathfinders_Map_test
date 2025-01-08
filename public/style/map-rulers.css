@@ -1,9 +1,7 @@
-.ruler-container-h {
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-.ruler-container-v {
+.ruler-container {
+  user-select: none;
+  pointer-events: none;
+
   position: absolute;
   left: 0;
   top: 0;

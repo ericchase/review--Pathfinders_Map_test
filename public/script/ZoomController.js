@@ -246,7 +246,12 @@ function SetupZoomControl(controller) {
 
   controller.setTransform(1, toPoint(0, 0));
 
+  let activeTouches = new Set();
+
   controller.container.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'touch') {
+      activeTouches.add(event.pointerId);
+    }
     if (event.button === 1) {
       // middle click
       controller.moveDelta(controller.coordinateSpace.deltaGlobalPointToContainerCenter(toPoint(event.clientX, event.clientY)));
@@ -259,12 +264,16 @@ function SetupZoomControl(controller) {
     }
   });
 
-  controller.container.addEventListener('pointerup', () => {
+  controller.container.addEventListener('pointerup', (event) => {
     isDragging = false;
+    //   if (event.pointerType === 'touch') {
+    activeTouches.delete(event.pointerId);
+    //   }
   });
 
-  controller.container.addEventListener('pointercancel', () => {
+  controller.container.addEventListener('pointercancel', (event) => {
     isDragging = false;
+    activeTouches.delete(event.pointerId);
   });
 
   controller.container.addEventListener('wheel', (event) => {
@@ -277,9 +286,13 @@ function SetupZoomControl(controller) {
   });
 
   document.addEventListener('pointermove', (event) => {
-    if (isDragging) {
-      controller.moveDelta(getDelta(dragStart, toPoint(event.clientX, event.clientY)));
-      dragStart = toPoint(event.clientX, event.clientY);
+    if (activeTouches.size > 1) {
+      event.preventDefault(); // disable pinch-to-zoom
+    } else {
+      if (isDragging) {
+        controller.moveDelta(getDelta(dragStart, toPoint(event.clientX, event.clientY)));
+        dragStart = toPoint(event.clientX, event.clientY);
+      }
     }
   });
 
