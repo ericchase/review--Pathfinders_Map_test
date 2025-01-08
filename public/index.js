@@ -64,3 +64,10 @@ toggle_legend.addEventListener('click', () => {
     legend.style.overflow = 'hidden';
   }
 });
+
+// load markers
+try {
+  const response = await fetch('./markers.svg');
+  const marker_elements = await response.text();
+  marker_container.insertAdjacentHTML('beforeend', marker_elements);
+} catch (error) {}

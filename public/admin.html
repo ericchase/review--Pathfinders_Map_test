@@ -6,7 +6,6 @@
     <title>Document</title>
     <link rel="stylesheet" href="./index.css" />
     <script src="./index.js" type="module"></script>
-    <script src="./marker-editor.js" type="module"></script>
   </head>
   <body>
     <div class="zoom-container" id="map-container">
@@ -15,27 +14,13 @@
       </div>
       <div class="ruler-container" id="ruler-container-v"><img class="ruler-v" id="ruler-v" src="./image/ruler-v.jpg" /></div>
       <div class="ruler-container" id="ruler-container-h"><img class="ruler-h" id="ruler-h" src="./image/ruler-h.jpg" /></div>
-      <svg class="marker-container" id="marker-container" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8000 8000" width="8000px" height="8000px">
-        <circle id="marker-1" cx="1850" cy="6750" r="500" stroke="blue" stroke-opacity="1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="blue" fill-opacity="0.2" fill-rule="evenodd" />
-      </svg>
-    </div>
-
-    <div id="marker-editor">
-      <label for="">
-        x
-        <input id="x" type="text" />
-      </label>
-      <label for="">
-        y
-        <input id="y" type="text" />
-      </label>
-      <label for="">
-        r
-        <input id="r" type="text" />
-      </label>
+      <svg class="marker-container" id="marker-container" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8000 8000" width="8000px" height="8000px"></svg>
     </div>
 
     <div id="legend">
+      <button id="toggle-legend">
+        <div></div>
+      </button>
       <h3>Map Legend</h3>
       <ul>
         <!-- Friendly Territory -->
@@ -80,6 +65,21 @@
           Enemy Patrol Route
         </li>
       </ul>
+    </div>
+
+    <div id="marker-editor">
+      <label for="">
+        x
+        <input id="x" type="text" />
+      </label>
+      <label for="">
+        y
+        <input id="y" type="text" />
+      </label>
+      <label for="">
+        r
+        <input id="r" type="text" />
+      </label>
     </div>
   </body>
 </html>
