@@ -52,7 +52,7 @@ zoomController.onTransform((scale, point) => {
 zoomController.init();
 zoomController.setScale(0.1);
 zoomController.centerChild();
-zoomController.setPosition(toPoint(zoomController.parse_x(), 10));
+// zoomController.setPosition(toPoint(zoomController.parse_x(), 10));
 
 // toggle legend contents
 toggle_legend.addEventListener('click', () => {
