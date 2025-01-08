@@ -1,4 +1,4 @@
-import { toInt, toPoint } from './script/CoordinateSpaceContainer.js';
+import { toInt } from './script/CoordinateSpaceContainer.js';
 import { NodeRef } from './script/lib/Node_Utility.js';
 import { ZoomController } from './script/ZoomController.js';
 
@@ -6,9 +6,20 @@ const child = document.getElementById('map');
 const container = document.getElementById('map-container');
 const legend = NodeRef(document.getElementById('legend')).as(HTMLElement);
 const toggle_legend = NodeRef(document.getElementById('toggle-legend')).as(HTMLButtonElement);
-const marker_container = NodeRef(document.getElementById('marker-container')).as(SVGElement);
+const highlight_container = NodeRef(document.getElementById('highlight-container')).as(SVGElement);
 const ruler_h = NodeRef(document.getElementById('ruler-h')).as(HTMLElement);
 const ruler_v = NodeRef(document.getElementById('ruler-v')).as(HTMLElement);
+
+// viewer settings
+function saveSettings(data) {
+  localStorage.setItem('settings', JSON.stringify(data));
+}
+function loadSettings() {
+  const settings = localStorage.getItem('settings');
+  return settings ? JSON.parse(settings) : undefined;
+}
+// load settings before setting up zoom controller
+const loaded_settings = loadSettings();
 
 // custom curve function for smooth zooming
 function zoomCurve(scale) {
@@ -30,10 +41,12 @@ const zoomController = new ZoomController(container, child, {
 
 // update other elements on drag and zoom
 zoomController.onTransform((scale, point) => {
-  // move and scale the marker container
-  marker_container.style.left = `${point.x}px`;
-  marker_container.style.top = `${point.y}px`;
-  marker_container.style.transform = `scale(${scale})`;
+  saveSettings({ scale, point });
+
+  // move and scale the highlight container
+  highlight_container.style.left = `${point.x}px`;
+  highlight_container.style.top = `${point.y}px`;
+  highlight_container.style.transform = `scale(${scale})`;
 
   const secondary_scale = Math.min(scale, 0.5);
 
@@ -50,9 +63,13 @@ zoomController.onTransform((scale, point) => {
 
 // initialize the controller
 zoomController.init();
-zoomController.setScale(0.1);
-zoomController.centerChild();
-// zoomController.setPosition(toPoint(zoomController.parse_x(), 10));
+if (loaded_settings) {
+  zoomController.setTransform(loaded_settings.scale, loaded_settings.point);
+} else {
+  zoomController.setScale(0.1);
+  zoomController.centerChild();
+  // zoomController.setPosition(toPoint(zoomController.parse_x(), 10));
+}
 
 // toggle legend contents
 toggle_legend.addEventListener('click', () => {
@@ -65,9 +82,8 @@ toggle_legend.addEventListener('click', () => {
   }
 });
 
-// load markers
+// load highlights
 try {
-  const response = await fetch('./markers.svg');
-  const marker_elements = await response.text();
-  marker_container.insertAdjacentHTML('beforeend', marker_elements);
+  const response = await fetch('./highlights.svg');
+  highlight_container.insertAdjacentHTML('beforeend', await response.text());
 } catch (error) {}

@@ -213,6 +213,13 @@ export class ZoomController {
   }
 
   /**
+   * @this ZoomController
+   */
+  getTransform() {
+    return { scale: this.parse_scale(), point: this.parse_position() };
+  }
+
+  /**
    * @param {number} scale
    * @param {object} point
    * @param {number} point.x
