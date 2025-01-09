@@ -1,11 +1,38 @@
+import { toPoint } from './script/CoordinateSpaceContainer.js';
 import { NodeRef } from './script/lib/Node_Utility.js';
-import { updateLegends } from './script/map-legends.js';
 import { getOverlayMarkers, isOverlayElement, loadOverlays } from './script/map-overlays.js';
 import { getRulerHRect, getRulerVRect, updateRulers } from './script/map-rulers.js';
 import { VisualElementEditor } from './script/VisualElementEditor.js';
 import { ZoomController } from './script/ZoomController.js';
 
 loadOverlays();
+
+// legend
+const mapLegend = NodeRef(document.getElementById('legend')).as(HTMLElement);
+function updateLegend(top) {
+  mapLegend.style.top = `${top}px`;
+}
+const navLegendButton = NodeRef(document.getElementById('navitem-legend')).as(HTMLButtonElement);
+mapLegend.querySelector('.toggle-button')?.addEventListener('click', () => {
+  toggleHidden(mapLegend, !togglePushed(navLegendButton));
+});
+navLegendButton.addEventListener('click', () => {
+  toggleHidden(mapLegend, !togglePushed(navLegendButton));
+});
+
+// briefing
+const mapBriefing = NodeRef(document.getElementById('briefing')).as(HTMLElement);
+function updateBriefing(left, top) {
+  mapBriefing.style.left = `${left}px`;
+  mapBriefing.style.top = `${top}px`;
+}
+const navBriefingButton = NodeRef(document.getElementById('navitem-briefing')).as(HTMLButtonElement);
+mapBriefing.querySelector('.toggle-button')?.addEventListener('click', () => {
+  toggleHidden(mapBriefing, !togglePushed(navBriefingButton));
+});
+navBriefingButton.addEventListener('click', () => {
+  toggleHidden(mapBriefing, !togglePushed(navBriefingButton));
+});
 
 const settings = loadSettings();
 
@@ -18,6 +45,9 @@ const zoomController = new ZoomController(zoomContainer, zoomChild, {
   zoom_delta_function: zoomCurve,
 });
 
+/**************
+ * ADMIN ONLY
+ **/
 const visualEditor = new VisualElementEditor({
   editorHandleContainer: zoomContainer,
   elementContainer: zoomChild,
@@ -25,6 +55,9 @@ const visualEditor = new VisualElementEditor({
 });
 
 zoomController.setClickListener((event) => {
+  /**************
+   * ADMIN ONLY
+   **/
   if (isOverlayElement(event.target)) {
     visualEditor.selectElement(event.target);
   } else {
@@ -32,6 +65,9 @@ zoomController.setClickListener((event) => {
   }
 });
 
+/**************
+ * ADMIN ONLY
+ **/
 zoomController.setDragListener((event, delta, consumeEvent) => {
   if (isOverlayElement(event.target) && visualEditor.isSelected(event.target)) {
     consumeEvent();
@@ -42,9 +78,14 @@ zoomController.setDragListener((event, delta, consumeEvent) => {
 zoomController.setTransformListener((scale, point) => {
   saveSettings({ scale, point });
 
+  const { x, y } = zoomController.coordinateSpace.containerPointToGlobalPoint(toPoint(0, 0));
   updateRulers(scale, point);
-  updateLegends(10 + getRulerVRect().width, 10 + getRulerHRect().height);
+  updateBriefing(10 + x + getRulerVRect().width, 10 + y + getRulerHRect().height);
+  updateLegend(10 + y + getRulerHRect().height);
 
+  /**************
+   * ADMIN ONLY
+   **/
   visualEditor.setScale(1 / scale);
   visualEditor.updateHandles();
 });
@@ -86,7 +127,7 @@ function saveSettings(data) {
 }
 
 const highlightContainer = NodeRef(document.getElementById('overlay-container-0')).as(SVGElement);
-const saveButton = NodeRef(document.getElementById('save')).as(HTMLButtonElement);
+const saveButton = NodeRef(document.getElementById('navitem-save')).as(HTMLButtonElement);
 
 saveButton.addEventListener('click', () => {
   saveOverlays();
@@ -108,5 +149,22 @@ function saveOverlays() {
       marker_data_list.push(marker.getData());
     }
     fetch('/write/markers', { method: 'POST', body: JSON.stringify(marker_data_list) });
+  }
+}
+
+function togglePushed(element) {
+  if (element.classList.contains('pushed')) {
+    element.classList.remove('pushed');
+    return false;
+  }
+  element.classList.add('pushed');
+  return true;
+}
+
+function toggleHidden(element, hidden) {
+  if (hidden) {
+    element.classList.add('hidden');
+  } else {
+    element.classList.remove('hidden');
   }
 }

@@ -118,11 +118,7 @@ export class CoordinateSpaceContainer {
    * @this CoordinateSpaceContainer
    */
   deltaGlobalPointToContainerCenter(point) {
-    return getDelta(
-      point,
-      this.containerPercentagesToContainerPoint(toPoint(0.5, 0.5)),
-      //
-    );
+    return this.deltaGlobalPointToContainerPoint(point, this.containerPercentagesToContainerPoint(toPoint(0.5, 0.5)));
   }
 
   /**

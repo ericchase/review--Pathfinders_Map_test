@@ -1,11 +1,37 @@
 import { scalePoint, toPoint } from './script/CoordinateSpaceContainer.js';
 import { NodeRef } from './script/lib/Node_Utility.js';
-import { updateLegends } from './script/map-legends.js';
 import { isOverlayMarker, loadOverlays, markerMap } from './script/map-overlays.js';
 import { getRulerHRect, getRulerVRect, updateRulers } from './script/map-rulers.js';
 import { ZoomController } from './script/ZoomController.js';
 
 loadOverlays();
+
+// legend
+const mapLegend = NodeRef(document.getElementById('legend')).as(HTMLElement);
+function updateLegend(top) {
+  mapLegend.style.top = `${top}px`;
+}
+const navLegendButton = NodeRef(document.getElementById('navitem-legend')).as(HTMLButtonElement);
+mapLegend.querySelector('.toggle-button')?.addEventListener('click', () => {
+  toggleHidden(mapLegend, !togglePushed(navLegendButton));
+});
+navLegendButton.addEventListener('click', () => {
+  toggleHidden(mapLegend, !togglePushed(navLegendButton));
+});
+
+// briefing
+const mapBriefing = NodeRef(document.getElementById('briefing')).as(HTMLElement);
+function updateBriefing(left, top) {
+  mapBriefing.style.left = `${left}px`;
+  mapBriefing.style.top = `${top}px`;
+}
+const navBriefingButton = NodeRef(document.getElementById('navitem-briefing')).as(HTMLButtonElement);
+mapBriefing.querySelector('.toggle-button')?.addEventListener('click', () => {
+  toggleHidden(mapBriefing, !togglePushed(navBriefingButton));
+});
+navBriefingButton.addEventListener('click', () => {
+  toggleHidden(mapBriefing, !togglePushed(navBriefingButton));
+});
 
 const settings = loadSettings();
 
@@ -28,8 +54,10 @@ zoomController.setClickListener((event) => {
 zoomController.setTransformListener((scale, point) => {
   saveSettings({ scale, point });
 
+  const { x, y } = zoomController.coordinateSpace.containerPointToGlobalPoint(toPoint(0, 0));
   updateRulers(scale, point);
-  updateLegends(10 + getRulerVRect().width, 10 + getRulerHRect().height);
+  updateBriefing(10 + x + getRulerVRect().width, 10 + y + getRulerHRect().height);
+  updateLegend(10 + y + getRulerHRect().height);
 });
 
 // initialize the controller
@@ -107,4 +135,21 @@ function addTooltip(scale, marker) {
 
   tooltip.style.left = `${marker.data.x - (tooltip_size.x - marker_size.x) / 2}px`;
   tooltip.style.top = `${marker.data.y - tooltip_size.y - 10}px`;
+}
+
+function togglePushed(element) {
+  if (element.classList.contains('pushed')) {
+    element.classList.remove('pushed');
+    return false;
+  }
+  element.classList.add('pushed');
+  return true;
+}
+
+function toggleHidden(element, hidden) {
+  if (hidden) {
+    element.classList.add('hidden');
+  } else {
+    element.classList.remove('hidden');
+  }
 }

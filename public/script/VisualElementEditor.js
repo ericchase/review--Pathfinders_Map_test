@@ -187,15 +187,11 @@ export class VisualElementEditor {
       this.activeElement.points[index].x += delta.x;
       this.activeElement.points[index].y += delta.y;
       // update handle
-      const point = this.coordinateSpace.childPointToGlobalPoint(this.activeElement, scalePoint(1 / this.scale, this.activeElement.points[index]));
+      const point = this.coordinateSpace.childPointToContainerPoint(this.activeElement, scalePoint(1 / this.scale, this.activeElement.points[index]));
       this.handleList[1 + index].element.style.left = `${point.x - VisualElementEditorHandle.Size / 2}px`;
       this.handleList[1 + index].element.style.top = `${point.y - VisualElementEditorHandle.Size / 2}px`;
       // update size handle
-      const rect = this.getSelectedElementRect();
-      if (rect) {
-        this.handleList[0].element.style.left = `${rect.x + rect.width + VisualElementEditorHandle.Size}px`;
-        this.handleList[0].element.style.top = `${rect.y + rect.height / 2 - VisualElementEditorHandle.Size / 2}px`;
-      }
+      this.updateSizeHandle();
     }
   }
 
@@ -323,7 +319,7 @@ export class VisualElementEditor {
     this.updateSizeHandle();
 
     if (this.activeElement instanceof SVGRectElement) {
-      const point = this.coordinateSpace.childPointToGlobalPoint(this.activeElement, scalePoint(1 / this.scale, toPoint(this.activeElement.x.baseVal.value, this.activeElement.y.baseVal.value)));
+      const point = this.coordinateSpace.childPointToContainerPoint(this.activeElement, scalePoint(1 / this.scale, toPoint(this.activeElement.x.baseVal.value, this.activeElement.y.baseVal.value)));
       const size = scalePoint(1 / this.scale, toPoint(this.activeElement.width.baseVal.value, this.activeElement.height.baseVal.value));
       // left edge
       this.handleList[1].element.style.left = `${point.x - VisualElementEditorHandle.Size / 2}px`;
@@ -340,7 +336,7 @@ export class VisualElementEditor {
     }
     if (this.activeElement instanceof SVGPolygonElement) {
       for (let i = 0; i < this.activeElement.points.length; i++) {
-        const point = this.coordinateSpace.childPointToGlobalPoint(this.activeElement, scalePoint(1 / this.scale, this.activeElement.points[i]));
+        const point = this.coordinateSpace.childPointToContainerPoint(this.activeElement, scalePoint(1 / this.scale, this.activeElement.points[i]));
         this.handleList[1 + i].element.style.left = `${point.x - VisualElementEditorHandle.Size / 2}px`;
         this.handleList[1 + i].element.style.top = `${point.y - VisualElementEditorHandle.Size / 2}px`;
       }
@@ -350,8 +346,9 @@ export class VisualElementEditor {
   updateSizeHandle() {
     const rect = this.getSelectedElementRect();
     if (rect) {
-      this.handleList[0].element.style.left = `${rect.x + rect.width + VisualElementEditorHandle.Size}px`;
-      this.handleList[0].element.style.top = `${rect.y + rect.height / 2 - VisualElementEditorHandle.Size / 2}px`;
+      const point = this.coordinateSpace.globalPointToContainerPoint(toPoint(rect.x + rect.width + VisualElementEditorHandle.Size, rect.y + rect.height / 2 - VisualElementEditorHandle.Size / 2));
+      this.handleList[0].element.style.left = `${point.x}px`;
+      this.handleList[0].element.style.top = `${point.y}px`;
     }
   }
 }

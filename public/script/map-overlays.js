@@ -14,6 +14,7 @@ export class Marker {
   constructor(data) {
     this.data = data;
     this.element = document.createElement('img');
+    this.element.classList.add('marker');
     this.element.draggable = false;
     this.element.src = './image/marker-icon.png';
     this.element.style.left = `${data.x}px`;
