@@ -2,16 +2,16 @@
  * @param {HTMLElement|SVGElement} element
  * @param {object} listeners
  * @param {(event:Event)=>void=} listeners.onContextMenu
+ * @param {(event:Event,point:{x:number;y:number;})=>void=} listeners.onClick
+ * @param {(event:Event,delta:{x:number;y:number;})=>void=} listeners.onDrag
+ * @param {(event:Event,delta:number,center:{x:number;y:number;})=>void=} listeners.onPinch
+ * @param {(event:Event,delta:number,point:{x:number;y:number;})=>void=} listeners.onScroll
  * @param {(event:Event,point:{x:number;y:number;})=>void=} listeners.onPointerDown
  * @param {(event:Event,point:{x:number;y:number;})=>void=} listeners.onPointerUp
  * @param {(event:Event,point:{x:number;y:number;})=>void=} listeners.onMiddleDown
  * @param {(event:Event,point:{x:number;y:number;})=>void=} listeners.onMiddleUp
  * @param {(event:Event,point:{x:number;y:number;})=>void=} listeners.onRightDown
  * @param {(event:Event,point:{x:number;y:number;})=>void=} listeners.onRightUp
- * @param {(event:Event,point:{x:number;y:number;})=>void=} listeners.onClick
- * @param {(event:Event,delta:{x:number;y:number;},setCapture:(element:Element)=>void)=>void=} listeners.onDrag
- * @param {(event:Event,delta:number,center:{x:number;y:number;})=>void=} listeners.onPinch
- * @param {(event:Event,delta:number,point:{x:number;y:number;})=>void=} listeners.onScroll
  */
 export function setupPointerEvents(element, listeners) {
   let dragStart = { x: 0, y: 0 };
@@ -26,38 +26,44 @@ export function setupPointerEvents(element, listeners) {
    */
   function pointersAdd(event) {
     pointersSet(event);
-    element.removeEventListener('pointermove', dragHandler);
-    element.removeEventListener('pointermove', pinchHandler);
     element.removeEventListener('pointerup', clickHandler);
+    window.removeEventListener('pointermove', dragHandler);
+    window.removeEventListener('pointermove', pinchHandler);
     switch (pointers.size) {
       case 1:
         dragStart = { x: event.clientX, y: event.clientY };
-        element.addEventListener('pointermove', dragHandler);
         element.addEventListener('pointerup', clickHandler);
+        window.addEventListener('pointermove', dragHandler);
+        window.addEventListener('pointerup', upHandler);
+        window.addEventListener('pointercancel', cancelHandler);
         break;
       case 2:
         pinchStart = getPinchDistance();
-        element.addEventListener('pointermove', pinchHandler);
+        window.addEventListener('pointermove', pinchHandler);
         break;
     }
   }
   function pointersClear() {
-    element.removeEventListener('pointermove', dragHandler);
-    element.removeEventListener('pointermove', pinchHandler);
+    pointers.clear();
+    element.removeEventListener('pointerup', clickHandler);
+    window.removeEventListener('pointermove', dragHandler);
+    window.removeEventListener('pointermove', pinchHandler);
+    window.removeEventListener('pointerup', upHandler);
+    window.removeEventListener('pointercancel', cancelHandler);
   }
   /**
    * @param {PointerEvent} event
    */
   function pointersDelete(event) {
     pointers.delete(event.pointerId);
-    element.removeEventListener('pointermove', dragHandler);
-    element.removeEventListener('pointermove', pinchHandler);
+    window.removeEventListener('pointermove', dragHandler);
+    window.removeEventListener('pointermove', pinchHandler);
     switch (pointers.size) {
       case 1:
-        element.addEventListener('pointermove', dragHandler);
+        window.addEventListener('pointermove', dragHandler);
         break;
       case 2:
-        element.addEventListener('pointermove', pinchHandler);
+        window.addEventListener('pointermove', pinchHandler);
         break;
     }
   }
@@ -86,7 +92,7 @@ export function setupPointerEvents(element, listeners) {
    * @param {PointerEvent} event
    */
   function clickHandler(event) {
-    element.removeEventListener('pointerup', clickHandler);
+    pointersClear();
     listeners.onClick?.(event, { x: event.clientX, y: event.clientY });
   }
 
@@ -98,9 +104,7 @@ export function setupPointerEvents(element, listeners) {
     pointersSet(event);
     const dragEnd = { x: event.clientX, y: event.clientY };
     const dragDelta = { x: dragEnd.x - dragStart.x, y: dragEnd.y - dragStart.y };
-    listeners.onDrag?.(event, dragDelta, (element) => {
-      element.setPointerCapture(event.pointerId);
-    });
+    listeners.onDrag?.(event, dragDelta);
     dragStart = dragEnd;
   }
 
@@ -173,18 +177,16 @@ export function setupPointerEvents(element, listeners) {
 
   element.addEventListener('contextmenu', contextmenuHandler);
   element.addEventListener('pointerdown', downHandler);
-  element.addEventListener('pointerup', upHandler);
-  element.addEventListener('pointercancel', cancelHandler);
   element.addEventListener('wheel', scrollHandler);
 
   return () => {
     element.removeEventListener('contextmenu', contextmenuHandler);
-    element.removeEventListener('pointercancel', cancelHandler);
     element.removeEventListener('pointerdown', downHandler);
-    element.removeEventListener('pointermove', dragHandler);
-    element.removeEventListener('pointermove', pinchHandler);
-    element.removeEventListener('pointerup', clickHandler);
-    element.removeEventListener('pointerup', upHandler);
     element.removeEventListener('wheel', scrollHandler);
+    element.removeEventListener('pointerup', clickHandler);
+    window.removeEventListener('pointerup', upHandler);
+    window.removeEventListener('pointercancel', cancelHandler);
+    window.removeEventListener('pointermove', dragHandler);
+    window.removeEventListener('pointermove', pinchHandler);
   };
 }

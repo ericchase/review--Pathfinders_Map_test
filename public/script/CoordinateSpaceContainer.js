@@ -1,4 +1,4 @@
-import { CNodeRef, NodeRef } from './lib/Node_Utility.js';
+import { NodeRef } from './lib/Node_Utility.js';
 
 /**
  * @param {string} string
@@ -58,25 +58,34 @@ export function toPoint(x, y) {
 
 export class CoordinateSpaceContainer {
   /**
-   * @type { HTMLElement }
+   * @param { Node } container
    */
-  container;
-  /**
-   * @type { Map<CNodeRef, HTMLElement> }
-   */
-  children = new Map();
-
   constructor(container) {
-    this.container = NodeRef(container).as(HTMLElement);
+    try {
+      this.container = NodeRef(container).as(HTMLElement);
+    } catch (error) {
+      this.container = NodeRef(container).as(SVGElement);
+    }
   }
-  addChild(child) {
-    const ref = NodeRef(child);
-    this.children.set(ref, ref.as(HTMLElement));
-    return ref;
+
+  parentMap = new Map();
+  addChild(child, parent) {
+    if (parent && this.parentMap.has(child) === false) {
+      this.parentMap.set(child, parent);
+    }
+  }
+  getParentTree(child) {
+    const tree = [];
+    let parent = this.parentMap.get(child);
+    while (parent) {
+      tree.push(parent);
+      parent = this.parentMap.get(parent);
+    }
+    return tree;
   }
 
   /**
-   * @param {HTMLElement} child
+   * @param {HTMLElement|SVGElement} child
    * @this CoordinateSpaceContainer
    */
   deltaChildCenterToContainerCenter(child) {
@@ -88,7 +97,7 @@ export class CoordinateSpaceContainer {
   }
 
   /**
-   * @param {HTMLElement} child
+   * @param {HTMLElement|SVGElement} child
    * @param {object} point
    * @param {number} point.x
    * @param {number} point.y
@@ -134,7 +143,7 @@ export class CoordinateSpaceContainer {
   }
 
   /**
-   * @param {HTMLElement} child
+   * @param {HTMLElement|SVGElement} child
    * @param {object} point
    * @param {number} point.x
    * @param {number} point.y
@@ -150,7 +159,7 @@ export class CoordinateSpaceContainer {
   }
 
   /**
-   * @param {HTMLElement} child
+   * @param {HTMLElement|SVGElement} child
    * @param {object} percentage
    * @param {number} percentage.x as a decimal
    * @param {number} percentage.y as a decimal
@@ -166,21 +175,31 @@ export class CoordinateSpaceContainer {
   }
 
   /**
-   * @param {HTMLElement} child
+   * @param {HTMLElement|SVGElement} child
    * @param {object} point
    * @param {number} point.x
    * @param {number} point.y
    */
   childPointToContainerPoint(child, point) {
-    return toPoint(
-      toFloat(child.style.left, 0) + point.x,
-      toFloat(child.style.top, 0) + point.y,
+    const new_point = toPoint(
+      point.x + toFloat(child.style.left, 0),
+      point.y + toFloat(child.style.top, 0),
       //
     );
+    for (const parent of this.getParentTree(child)) {
+      new_point.x += toFloat(parent.style.left, 0);
+      new_point.y += toFloat(parent.style.top, 0);
+    }
+    return new_point;
+    // return toPoint(
+    //   toFloat(child.style.left, 0) + point.x,
+    //   toFloat(child.style.top, 0) + point.y,
+    //   //
+    // );
   }
 
   /**
-   * @param {HTMLElement} child
+   * @param {HTMLElement|SVGElement} child
    * @param {object} point
    * @param {number} point.x
    * @param {number} point.y
@@ -236,7 +255,7 @@ export class CoordinateSpaceContainer {
   }
 
   /**
-   * @param {HTMLElement} child
+   * @param {HTMLElement|SVGElement} child
    * @param {object} point
    * @param {number} point.x
    * @param {number} point.y

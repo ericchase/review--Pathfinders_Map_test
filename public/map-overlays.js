@@ -13,7 +13,7 @@ export async function loadOverlays() {
     const response = await fetch('./map-highlights.svg');
     overlay_container.insertAdjacentHTML('beforeend', await response.text());
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 
   // load markers

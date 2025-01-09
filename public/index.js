@@ -9,8 +9,6 @@ loadOverlays();
 
 const settings = loadSettings();
 
-const visualEditor = new VisualElementEditor();
-
 const zoomContainer = NodeRef(document.getElementById('zoom-container-0')).as(HTMLElement);
 const zoomChild = NodeRef(document.getElementById('zoom-child-0')).as(HTMLElement);
 const zoomController = new ZoomController(zoomContainer, zoomChild, {
@@ -18,6 +16,12 @@ const zoomController = new ZoomController(zoomContainer, zoomChild, {
   zoom_min: 0.05,
   zoom_max: 4,
   zoom_delta_function: zoomCurve,
+});
+
+const visualEditor = new VisualElementEditor({
+  editorHandleContainer: zoomContainer,
+  elementContainer: zoomChild,
+  elementContainerCoordinateSpace: zoomController.coordinateSpace,
 });
 
 zoomController.setClickListener((event) => {
@@ -28,10 +32,9 @@ zoomController.setClickListener((event) => {
   }
 });
 
-zoomController.setDragListener((event, delta, setCapture, consumeEvent) => {
-  if (isOverlayElement(event.target) && visualEditor.isSelected(event.target)) {
+zoomController.setDragListener((event, delta, consumeEvent) => {
+  if (visualEditor.activeElement) {
     consumeEvent();
-    setCapture(event.target);
     visualEditor.moveSelectedElementBy(delta);
   }
 });
@@ -46,6 +49,7 @@ zoomController.setTransformListener((scale, point) => {
   // updateMarkerEditorHandles(scale);
 
   visualEditor.setScale(1 / scale);
+  visualEditor.updateHandles();
 });
 
 // initialize the controller

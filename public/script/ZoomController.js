@@ -59,7 +59,7 @@ export class ZoomController {
   }
 
   /**
-   * @param {(event:Event,delta:{x:number;y:number;},setCapture:(element:Element)=>void,consumeEvent:()=>void)=>void} fn
+   * @param {(event:Event,delta:{x:number;y:number;},consumeEvent:()=>void)=>void} fn
    * @this ZoomController
    */
   setDragListener(fn) {
@@ -283,14 +283,13 @@ export class ZoomController {
       onContextMenu(event) {
         event.preventDefault();
       },
-      onDrag(event, delta, setCapture) {
+      onDrag(event, delta) {
         event.preventDefault();
         let eventConsumed = false;
-        self.onDrag?.(event, delta, setCapture, () => {
+        self.onDrag?.(event, delta, () => {
           eventConsumed = true;
         });
         if (eventConsumed === false) {
-          setCapture(self.container);
           self.moveDelta(delta);
         }
       },
