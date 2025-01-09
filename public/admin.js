@@ -104,7 +104,7 @@ function saveOverlays() {
   }
   {
     const marker_data_list = [];
-    for (const marker of getOverlayMarkers()) {
+    for (const [_, marker] of getOverlayMarkers()) {
       marker_data_list.push(marker.getData());
     }
     fetch('/write/markers', { method: 'POST', body: JSON.stringify(marker_data_list) });

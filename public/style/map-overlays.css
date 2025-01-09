@@ -2,9 +2,10 @@
   pointer-events: auto;
 }
 
-.marker-container > * {
-  pointer-events: auto;
-  position: absolute;
+.overlay-container > .selected {
+  stroke-dasharray: 10, 10;
+  stroke-dashoffset: 0;
+  animation: dashAnimation 0.5s linear infinite;
 }
 
 @keyframes dashAnimation {
@@ -16,8 +17,40 @@
   }
 }
 
-.overlay-container > .selected {
-  stroke-dasharray: 10, 10;
-  stroke-dashoffset: 0;
-  animation: dashAnimation 0.5s linear infinite;
+.marker-container > * {
+  pointer-events: auto;
+  position: absolute;
+}
+
+/* tooltip */
+
+.marker-tooltip {
+  line-height: 1;
+  background-color: white;
+  border-radius: 1em;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  padding: 1em;
+  pointer-events: auto;
+  position: absolute;
+  max-width: 10em;
+}
+.marker-tooltip-header {
+  margin-bottom: 0.5em;
+  position: relative;
+}
+.marker-tooltip-title {
+  font-weight: bold;
+}
+.marker-tooltip-close {
+  position: absolute;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25em;
+  padding: 0;
+  top: -0.5em;
+  right: 0;
+}
+.marker-tooltip-close:hover {
+  color: red;
 }

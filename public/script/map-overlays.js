@@ -18,8 +18,8 @@ export class Marker {
     this.element.src = './image/marker-icon.png';
     this.element.style.left = `${data.x}px`;
     this.element.style.top = `${data.y}px`;
+    this.open = false;
   }
-
   getData() {
     this.data.x = toFloat(this.element.style.left, 0);
     this.data.y = toFloat(this.element.style.top, 0);
@@ -31,9 +31,9 @@ const highlightContainer = NodeRef(document.getElementById('overlay-container-0'
 const markerContainer = NodeRef(document.getElementById('marker-container-0')).as(HTMLElement);
 
 /** @type {Set<Element>} */
-const element_set = new Set();
-/** @type {Set<Marker>} */
-const marker_set = new Set();
+export const overlaySet = new Set();
+/** @type {Map<Element,Marker>} */
+export const markerMap = new Map();
 
 export async function loadOverlays() {
   // load highlights
@@ -45,7 +45,7 @@ export async function loadOverlays() {
   }
   // add to element set
   for (const child of highlightContainer.children) {
-    element_set.add(child);
+    overlaySet.add(child);
   }
 
   // load markers
@@ -53,9 +53,9 @@ export async function loadOverlays() {
     const response = await fetch('./map-markers.json');
     for (const data of await response.json()) {
       const marker = new Marker(data);
-      marker_set.add(marker);
+      markerMap.set(marker.element, marker);
       markerContainer.appendChild(marker.element);
-      element_set.add(marker.element);
+      overlaySet.add(marker.element);
     }
   } catch (error) {
     console.error(error);
@@ -63,7 +63,7 @@ export async function loadOverlays() {
 }
 
 export function getOverlayMarkers() {
-  return marker_set;
+  return markerMap;
 }
 
 /**
@@ -71,5 +71,13 @@ export function getOverlayMarkers() {
  * @return {element is Element}
  */
 export function isOverlayElement(element) {
-  return element instanceof Element && element_set.has(element);
+  return element instanceof Element && overlaySet.has(element);
+}
+
+/**
+ * @param {*} element
+ * @return {element is Element}
+ */
+export function isOverlayMarker(element) {
+  return element instanceof Element && markerMap.has(element);
 }

@@ -1,6 +1,7 @@
+import { scalePoint, toPoint } from './script/CoordinateSpaceContainer.js';
 import { NodeRef } from './script/lib/Node_Utility.js';
 import { updateLegends } from './script/map-legends.js';
-import { loadOverlays } from './script/map-overlays.js';
+import { isOverlayMarker, loadOverlays, markerMap } from './script/map-overlays.js';
 import { getRulerHRect, getRulerVRect, updateRulers } from './script/map-rulers.js';
 import { ZoomController } from './script/ZoomController.js';
 
@@ -15,6 +16,13 @@ const zoomController = new ZoomController(zoomContainer, zoomChild, {
   zoom_min: 0.05,
   zoom_max: 4,
   zoom_delta_function: zoomCurve,
+});
+
+zoomController.setClickListener((event) => {
+  const marker = isOverlayMarker(event.target) && markerMap.get(event.target);
+  if (marker && marker.open === false) {
+    addTooltip(zoomController.parse_scale(), marker);
+  }
 });
 
 zoomController.setTransformListener((scale, point) => {
@@ -58,4 +66,45 @@ function loadSettings() {
  */
 function saveSettings(data) {
   localStorage.setItem('settings', JSON.stringify(data));
+}
+
+// this is slop, but i'm tired
+function addTooltip(scale, marker) {
+  marker.open = true;
+
+  const tooltip = document.createElement('div');
+  const header = document.createElement('div');
+  const title = document.createElement('span');
+  const close = document.createElement('button');
+  const description = document.createElement('div');
+
+  tooltip.classList.add('marker-tooltip');
+  header.classList.add('marker-tooltip-header');
+  title.classList.add('marker-tooltip-title');
+  close.classList.add('marker-tooltip-close');
+  description.classList.add('marker-tooltip-description');
+
+  tooltip.appendChild(header);
+  header.appendChild(title);
+  header.appendChild(close);
+  tooltip.appendChild(description);
+  zoomChild.append(tooltip);
+
+  close.textContent = 'x';
+  close.addEventListener('click', () => {
+    marker.open = false;
+    tooltip.remove();
+  });
+
+  title.innerText = marker.data.title;
+  description.innerText = marker.data.description;
+  tooltip.style.removeProperty('display');
+
+  const marker_rect = marker.element.getBoundingClientRect();
+  const marker_size = scalePoint(1 / scale, toPoint(marker_rect.width, marker_rect.height));
+  const tooltip_rect = tooltip.getBoundingClientRect();
+  const tooltip_size = scalePoint(1 / scale, toPoint(tooltip_rect.width, tooltip_rect.height));
+
+  tooltip.style.left = `${marker.data.x - (tooltip_size.x - marker_size.x) / 2}px`;
+  tooltip.style.top = `${marker.data.y - tooltip_size.y - 10}px`;
 }
