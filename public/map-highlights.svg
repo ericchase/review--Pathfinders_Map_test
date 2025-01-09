@@ -1,4 +1,3 @@
 <polygon id="marker-2" points="385,860 6800,680 7230,7700 5250,7750 650,5350" stroke="red" stroke-opacity="1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="red" fill-opacity="0.1"></polygon>
-
-
-<circle id="marker-0" cx="1841.48" cy="6625.3" r="296.336" stroke="blue" stroke-opacity="1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="blue" fill-opacity="0.1"></circle><rect id="marker-1" x="1986.01" y="6786.24" width="333.792" height="244.439" stroke="green" stroke-opacity="1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="green" fill-opacity="0.1"></rect>
+<circle id="marker-0" cx="1841.48" cy="6625.3" r="296.336" stroke="blue" stroke-opacity="1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="blue" fill-opacity="0.1"></circle>
+<rect id="marker-1" x="1986.01" y="6786.24" width="333.792" height="244.439" stroke="green" stroke-opacity="1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="green" fill-opacity="0.1"></rect>

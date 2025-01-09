@@ -1,9 +1,7 @@
-import { getOverlayMarkers } from './map-overlays.js';
 import { NodeRef } from './script/lib/Node_Utility.js';
-
-import { updateLegends } from './map-legends.js';
-import { isOverlayElement, loadOverlays } from './map-overlays.js';
-import { getRulerHRect, getRulerVRect, updateRulers } from './map-rulers.js';
+import { updateLegends } from './script/map-legends.js';
+import { getOverlayMarkers, isOverlayElement, loadOverlays } from './script/map-overlays.js';
+import { getRulerHRect, getRulerVRect, updateRulers } from './script/map-rulers.js';
 import { VisualElementEditor } from './script/VisualElementEditor.js';
 import { ZoomController } from './script/ZoomController.js';
 
@@ -96,11 +94,13 @@ saveButton.addEventListener('click', () => {
 
 function saveOverlays() {
   {
+    const children_html = [];
     const clone = NodeRef(highlightContainer.cloneNode(true)).as(SVGElement);
     for (const element of clone.children) {
       element.removeAttribute('class');
+      children_html.push(element.outerHTML.trim());
     }
-    fetch('/write/highlights', { method: 'POST', body: clone.innerHTML.trim() });
+    fetch('/write/highlights', { method: 'POST', body: children_html.join('\n').trim() });
   }
   {
     const marker_data_list = [];

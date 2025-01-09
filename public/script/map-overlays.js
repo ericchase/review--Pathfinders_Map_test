@@ -1,5 +1,5 @@
-import { toFloat } from './script/CoordinateSpaceContainer.js';
-import { NodeRef } from './script/lib/Node_Utility.js';
+import { toFloat } from './CoordinateSpaceContainer.js';
+import { NodeRef } from './lib/Node_Utility.js';
 
 export class Marker {
   /**

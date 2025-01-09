@@ -1,4 +1,4 @@
-import { NodeRef } from './script/lib/Node_Utility.js';
+import { NodeRef } from './lib/Node_Utility.js';
 
 const ruler_h = NodeRef(document.getElementById('ruler-h')).as(HTMLElement);
 const ruler_v = NodeRef(document.getElementById('ruler-v')).as(HTMLElement);

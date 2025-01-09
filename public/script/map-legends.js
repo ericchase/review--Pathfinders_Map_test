@@ -1,5 +1,5 @@
-import { toInt } from './script/CoordinateSpaceContainer.js';
-import { NodeRef } from './script/lib/Node_Utility.js';
+import { toInt } from './CoordinateSpaceContainer.js';
+import { NodeRef } from './lib/Node_Utility.js';
 
 const legend = NodeRef(document.getElementById('legend')).as(HTMLElement);
 const toggle_legend_button = NodeRef(document.getElementById('toggle-legend')).as(HTMLButtonElement);

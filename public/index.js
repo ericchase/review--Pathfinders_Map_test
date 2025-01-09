@@ -1,7 +1,7 @@
-import { updateLegends } from './map-legends.js';
-import { loadOverlays } from './map-overlays.js';
-import { getRulerHRect, getRulerVRect, updateRulers } from './map-rulers.js';
 import { NodeRef } from './script/lib/Node_Utility.js';
+import { updateLegends } from './script/map-legends.js';
+import { loadOverlays } from './script/map-overlays.js';
+import { getRulerHRect, getRulerVRect, updateRulers } from './script/map-rulers.js';
 import { ZoomController } from './script/ZoomController.js';
 
 loadOverlays();
