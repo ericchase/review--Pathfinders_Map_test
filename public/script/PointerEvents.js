@@ -58,14 +58,6 @@ export function setupPointerEvents(element, listeners) {
     pointers.delete(event.pointerId);
     window.removeEventListener('pointermove', dragHandler);
     window.removeEventListener('pointermove', pinchHandler);
-    switch (pointers.size) {
-      case 1:
-        window.addEventListener('pointermove', dragHandler);
-        break;
-      case 2:
-        window.addEventListener('pointermove', pinchHandler);
-        break;
-    }
   }
   /**
    * @param {PointerEvent} event
