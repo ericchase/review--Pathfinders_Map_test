@@ -1,0 +1,18 @@
+.overlay-container > * {
+  pointer-events: auto;
+}
+
+@keyframes dashAnimation {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 20;
+  }
+}
+
+.overlay-container > .selected {
+  stroke-dasharray: 10, 10;
+  stroke-dashoffset: 0;
+  animation: dashAnimation 0.5s linear infinite;
+}

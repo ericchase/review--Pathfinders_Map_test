@@ -77,7 +77,7 @@ export class CoordinateSpaceContainer {
 
   /**
    * @param {HTMLElement} child
-   * @memberof CordinateSpaceContainer
+   * @this CoordinateSpaceContainer
    */
   deltaChildCenterToContainerCenter(child) {
     return getDelta(
@@ -92,7 +92,7 @@ export class CoordinateSpaceContainer {
    * @param {object} point
    * @param {number} point.x
    * @param {number} point.y
-   * @memberof CordinateSpaceContainer
+   * @this CoordinateSpaceContainer
    */
   deltaChildPointToContainerCenter(child, point) {
     return getDelta(
@@ -106,7 +106,7 @@ export class CoordinateSpaceContainer {
    * @param {object} point
    * @param {number} point.x
    * @param {number} point.y
-   * @memberof CordinateSpaceContainer
+   * @this CoordinateSpaceContainer
    */
   deltaGlobalPointToContainerCenter(point) {
     return getDelta(
@@ -123,7 +123,7 @@ export class CoordinateSpaceContainer {
    * @param {object} container_point
    * @param {number} container_point.x
    * @param {number} container_point.y
-   * @memberof CordinateSpaceContainer
+   * @this CoordinateSpaceContainer
    */
   deltaGlobalPointToContainerPoint(global_point, container_point) {
     return getDelta(
@@ -138,7 +138,7 @@ export class CoordinateSpaceContainer {
    * @param {object} point
    * @param {number} point.x
    * @param {number} point.y
-   * @memberof CordinateSpaceContainer
+   * @this CoordinateSpaceContainer
    */
   childPointToChildPercentages(child, point) {
     const rect = child.getBoundingClientRect();
@@ -154,7 +154,7 @@ export class CoordinateSpaceContainer {
    * @param {object} percentage
    * @param {number} percentage.x as a decimal
    * @param {number} percentage.y as a decimal
-   * @memberof CordinateSpaceContainer
+   * @this CoordinateSpaceContainer
    */
   childPercentagesToChildPoint(child, percentage) {
     const rect = child.getBoundingClientRect();
@@ -184,7 +184,7 @@ export class CoordinateSpaceContainer {
    * @param {object} point
    * @param {number} point.x
    * @param {number} point.y
-   * @memberof CordinateSpaceContainer
+   * @this CoordinateSpaceContainer
    */
   childPointToGlobalPoint(child, point) {
     return this.containerPointToGlobalPoint(this.childPointToContainerPoint(child, point));
@@ -194,7 +194,7 @@ export class CoordinateSpaceContainer {
    * @param {object} point
    * @param {number} point.x
    * @param {number} point.y
-   * @memberof CordinateSpaceContainer
+   * @this CoordinateSpaceContainer
    */
   containerPointToContainerPercentages(point) {
     const rect = this.container.getBoundingClientRect();
@@ -209,7 +209,7 @@ export class CoordinateSpaceContainer {
    * @param {object} percentage
    * @param {number} percentage.x as a decimal
    * @param {number} percentage.y as a decimal
-   * @memberof CordinateSpaceContainer
+   * @this CoordinateSpaceContainer
    */
   containerPercentagesToContainerPoint(percentage) {
     const rect = this.container.getBoundingClientRect();
@@ -224,7 +224,7 @@ export class CoordinateSpaceContainer {
    * @param {object} point
    * @param {number} point.x
    * @param {number} point.y
-   * @memberof CordinateSpaceContainer
+   * @this CoordinateSpaceContainer
    */
   containerPointToGlobalPoint(point) {
     const rect = this.container.getBoundingClientRect();
@@ -240,7 +240,7 @@ export class CoordinateSpaceContainer {
    * @param {object} point
    * @param {number} point.x
    * @param {number} point.y
-   * @memberof CordinateSpaceContainer
+   * @this CoordinateSpaceContainer
    */
   globalPointToChildPoint(child, point) {
     const container = this.globalPointToContainerPoint(point);
@@ -255,7 +255,7 @@ export class CoordinateSpaceContainer {
    * @param {object} point
    * @param {number} point.x
    * @param {number} point.y
-   * @memberof CordinateSpaceContainer
+   * @this CoordinateSpaceContainer
    */
   globalPointToContainerPoint(point) {
     const rect = this.container.getBoundingClientRect();

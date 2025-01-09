@@ -8,6 +8,8 @@
     "checkJs": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "outDir": "@types"
+    "outDir": "@types",
+
+    "strictNullChecks": true
   }
 }

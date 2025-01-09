@@ -9,7 +9,7 @@
  * @param {(event:Event,point:{x:number;y:number;})=>void=} listeners.onRightDown
  * @param {(event:Event,point:{x:number;y:number;})=>void=} listeners.onRightUp
  * @param {(event:Event,point:{x:number;y:number;})=>void=} listeners.onClick
- * @param {(event:Event,delta:{x:number;y:number;},setCapture:(element:HTMLElement|SVGElement)=>void)=>void=} listeners.onDrag
+ * @param {(event:Event,delta:{x:number;y:number;},setCapture:(element:Element)=>void)=>void=} listeners.onDrag
  * @param {(event:Event,delta:number,center:{x:number;y:number;})=>void=} listeners.onPinch
  * @param {(event:Event,delta:number,point:{x:number;y:number;})=>void=} listeners.onScroll
  */

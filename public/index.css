@@ -1,7 +1,11 @@
+@import url('./style/VisualElementEditor.css');
+@import url('./style/ZoomController.css');
+
 @import url('./style/page.css');
+
 @import url('./style/map-legends.css');
+@import url('./style/map-overlays.css');
 @import url('./style/map-rulers.css');
-@import url('./style/zoom-container.css');
 
 #zoom-container-0 {
   width: 100%;

@@ -18,12 +18,13 @@ export class ZoomController {
     this.container = this.containerRef.as(HTMLElement);
     this.childRef = NodeRef(child_element);
     this.child = this.childRef.as(HTMLElement);
-    this.options = options;
-    this.options.enable_edge_clamping ??= false;
-    this.options.zoom_max ??= 2;
-    this.options.zoom_min ??= 0.1;
-    this.options.zoom_delta ??= 0.5;
-    this.options.zoom_delta_function ??= () => options.zoom_delta;
+    this.options = {
+      enable_edge_clamping: options.enable_edge_clamping ?? false,
+      zoom_max: options.zoom_max ?? 2,
+      zoom_min: options.zoom_min ?? 0.1,
+      zoom_delta: options.zoom_delta ?? 0.5,
+      zoom_delta_function: options.zoom_delta_function,
+    };
 
     this.child_original_rectangle = this.child.getBoundingClientRect();
 
@@ -58,7 +59,7 @@ export class ZoomController {
   }
 
   /**
-   * @param {(event:Event,delta:{x:number;y:number;},setCapture:(element:HTMLElement|SVGElement)=>void,consumeEvent:()=>void)=>void} fn
+   * @param {(event:Event,delta:{x:number;y:number;},setCapture:(element:Element)=>void,consumeEvent:()=>void)=>void} fn
    * @this ZoomController
    */
   setDragListener(fn) {
@@ -155,7 +156,7 @@ export class ZoomController {
    */
   zoomIn(point) {
     const scale = this.parse_scale();
-    const delta_zoom_clamped = this.options.zoom_delta_function(scale);
+    const delta_zoom_clamped = this.options.zoom_delta_function?.(scale) ?? this.options.zoom_delta;
     const scale_clamped = Math.min(this.options.zoom_max, Math.max(scale + delta_zoom_clamped, this.options.zoom_min));
     this.zoomTo(scale_clamped, point);
   }
@@ -168,7 +169,7 @@ export class ZoomController {
    */
   zoomOut(point) {
     const scale = this.parse_scale();
-    const delta_zoom_clamped = -1 * this.options.zoom_delta_function(scale);
+    const delta_zoom_clamped = -1 * (this.options.zoom_delta_function?.(scale) ?? this.options.zoom_delta);
     const scale_clamped = Math.min(this.options.zoom_max, Math.max(scale + delta_zoom_clamped, this.options.zoom_min));
     this.zoomTo(scale_clamped, point);
   }
