@@ -1,4 +1,4 @@
-import { CoordinateSpaceContainer, scalePoint, toPoint } from './CoordinateSpaceContainer.js';
+import { CoordinateSpaceContainer, scalePoint, toFloat, toPoint } from './CoordinateSpaceContainer.js';
 import { setupPointerEvents } from './PointerEvents.js';
 
 class VisualElementEditorHandle {
@@ -208,6 +208,10 @@ export class VisualElementEditor {
   moveSelectedElementBy(delta) {
     delta = scalePoint(this.scale, delta);
 
+    if (this.activeElement instanceof HTMLElement) {
+      this.activeElement.style.left = `${toFloat(this.activeElement.style.left, 0) + delta.x}px`;
+      this.activeElement.style.top = `${toFloat(this.activeElement.style.top, 0) + delta.y}px`;
+    }
     if (this.activeElement instanceof SVGCircleElement) {
       this.activeElement.cx.baseVal.value += delta.x;
       this.activeElement.cy.baseVal.value += delta.y;
@@ -283,27 +287,33 @@ export class VisualElementEditor {
   }
 
   showHandles() {
-    this.handleList[0].show((delta) => {
-      this.resizeSelectedElementBy(delta);
-    });
-    if (this.activeElement instanceof SVGRectElement) {
-      while (this.handleList.length < 1 + 4) {
-        this.handleList.push(new VisualElementEditorHandle(this.editorHandleContainer, this));
+    if (this.activeElement instanceof HTMLElement) {
+      this.handleList[0].show((delta) => {
+        this.moveSelectedElementBy(delta);
+      });
+    } else {
+      this.handleList[0].show((delta) => {
+        this.resizeSelectedElementBy(delta);
+      });
+      if (this.activeElement instanceof SVGRectElement) {
+        while (this.handleList.length < 1 + 4) {
+          this.handleList.push(new VisualElementEditorHandle(this.editorHandleContainer, this));
+        }
+        for (let i = 0; i < 1 + 4; i++) {
+          this.handleList[i].show((delta) => {
+            this.moveEdgeBy(delta, i);
+          });
+        }
       }
-      for (let i = 0; i < 1 + 4; i++) {
-        this.handleList[i].show((delta) => {
-          this.moveEdgeBy(delta, i);
-        });
-      }
-    }
-    if (this.activeElement instanceof SVGPolygonElement) {
-      while (this.handleList.length < 1 + this.activeElement.points.length) {
-        this.handleList.push(new VisualElementEditorHandle(this.editorHandleContainer, this));
-      }
-      for (let i = 0; i < this.activeElement.points.length; i++) {
-        this.handleList[1 + i].show((delta) => {
-          this.moveVertexBy(delta, i);
-        });
+      if (this.activeElement instanceof SVGPolygonElement) {
+        while (this.handleList.length < 1 + this.activeElement.points.length) {
+          this.handleList.push(new VisualElementEditorHandle(this.editorHandleContainer, this));
+        }
+        for (let i = 0; i < this.activeElement.points.length; i++) {
+          this.handleList[1 + i].show((delta) => {
+            this.moveVertexBy(delta, i);
+          });
+        }
       }
     }
     this.updateHandles();

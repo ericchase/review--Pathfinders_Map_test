@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { query } from './db.js';
 import { ConsoleLog } from './lib/ericchase/Utility/Console.js';
 
@@ -11,6 +12,38 @@ export async function post(req: Request, url: URL, pathname: string): Promise<Re
 
   // custom routing here
   switch (pathname) {
+    case '/write/highlights':
+      try {
+        if (Bun.env.PUBLIC_PATH) {
+          const public_path = path.normalize(Bun.env.PUBLIC_PATH);
+          Bun.write(path.join(public_path, './map-highlights.svg'), await req.json());
+        }
+        return new Response('OK', { status: 200 });
+      } catch (error) {
+        return new Response(JSON.stringify(error), {
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json',
+          },
+          status: 500,
+        });
+      }
+    case '/write/markers':
+      try {
+        if (Bun.env.PUBLIC_PATH) {
+          const public_path = path.normalize(Bun.env.PUBLIC_PATH);
+          Bun.write(path.join(public_path, './map-markers.json'), await req.json());
+        }
+        return new Response('OK', { status: 200 });
+      } catch (error) {
+        return new Response(JSON.stringify(error), {
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json',
+          },
+          status: 500,
+        });
+      }
     case '/database/query': {
       try {
         const { text, params } = await req.json();

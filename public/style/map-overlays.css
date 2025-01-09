@@ -2,6 +2,11 @@
   pointer-events: auto;
 }
 
+.marker-container > * {
+  pointer-events: auto;
+  position: absolute;
+}
+
 @keyframes dashAnimation {
   from {
     stroke-dashoffset: 0;

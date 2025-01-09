@@ -11,3 +11,21 @@
   width: 100%;
   height: 100%;
 }
+
+#overlay-container-0,
+#marker-container-0 {
+  width: 8000px;
+  height: 8000px;
+}
+
+#navbar {
+  font-size: 1em;
+  padding: 0.5em;
+  background-color: white;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+}
+#navbar > #save {
+  font-size: 1em;
+}

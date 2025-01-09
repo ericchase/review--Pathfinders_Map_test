@@ -1,5 +1,5 @@
 import { updateLegends } from './map-legends.js';
-import { isOverlayElement, loadOverlays } from './map-overlays.js';
+import { isOverlayElement, loadOverlays, saveOverlays } from './map-overlays.js';
 import { getRulerHRect, getRulerVRect, updateRulers } from './map-rulers.js';
 import { NodeRef } from './script/lib/Node_Utility.js';
 import { VisualElementEditor } from './script/VisualElementEditor.js';
@@ -87,3 +87,8 @@ function loadSettings() {
 function saveSettings(data) {
   localStorage.setItem('settings', JSON.stringify(data));
 }
+
+const saveButton = NodeRef(document.getElementById('save')).as(HTMLButtonElement);
+saveButton.addEventListener('click', () => {
+  saveOverlays();
+});
