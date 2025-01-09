@@ -16,7 +16,7 @@ export async function post(req: Request, url: URL, pathname: string): Promise<Re
       try {
         if (Bun.env.PUBLIC_PATH) {
           const public_path = path.normalize(Bun.env.PUBLIC_PATH);
-          Bun.write(path.join(public_path, './map-highlights.svg'), await req.json());
+          Bun.write(path.join(public_path, './map-highlights.svg'), await req.text());
         }
         return new Response('OK', { status: 200 });
       } catch (error) {
@@ -32,7 +32,7 @@ export async function post(req: Request, url: URL, pathname: string): Promise<Re
       try {
         if (Bun.env.PUBLIC_PATH) {
           const public_path = path.normalize(Bun.env.PUBLIC_PATH);
-          Bun.write(path.join(public_path, './map-markers.json'), await req.json());
+          Bun.write(path.join(public_path, './map-markers.json'), await req.text());
         }
         return new Response('OK', { status: 200 });
       } catch (error) {

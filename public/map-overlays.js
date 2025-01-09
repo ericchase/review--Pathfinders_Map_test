@@ -1,6 +1,7 @@
+import { toFloat } from './script/CoordinateSpaceContainer.js';
 import { NodeRef } from './script/lib/Node_Utility.js';
 
-class Marker {
+export class Marker {
   /**
    * Creates an instance of Marker.
    * @param {object} data
@@ -18,10 +19,16 @@ class Marker {
     this.element.style.left = `${data.x}px`;
     this.element.style.top = `${data.y}px`;
   }
+
+  getData() {
+    this.data.x = toFloat(this.element.style.left, 0);
+    this.data.y = toFloat(this.element.style.top, 0);
+    return this.data;
+  }
 }
 
-const highlight_container = NodeRef(document.getElementById('overlay-container-0')).as(SVGElement);
-const marker_container = NodeRef(document.getElementById('marker-container-0')).as(HTMLElement);
+const highlightContainer = NodeRef(document.getElementById('overlay-container-0')).as(SVGElement);
+const markerContainer = NodeRef(document.getElementById('marker-container-0')).as(HTMLElement);
 
 /** @type {Set<Element>} */
 const element_set = new Set();
@@ -32,12 +39,12 @@ export async function loadOverlays() {
   // load highlights
   try {
     const response = await fetch('./map-highlights.svg');
-    highlight_container.insertAdjacentHTML('beforeend', await response.text());
+    highlightContainer.insertAdjacentHTML('beforeend', await response.text());
   } catch (error) {
     console.error(error);
   }
   // add to element set
-  for (const child of highlight_container.children) {
+  for (const child of highlightContainer.children) {
     element_set.add(child);
   }
 
@@ -47,7 +54,7 @@ export async function loadOverlays() {
     for (const data of await response.json()) {
       const marker = new Marker(data);
       marker_set.add(marker);
-      marker_container.appendChild(marker.element);
+      markerContainer.appendChild(marker.element);
       element_set.add(marker.element);
     }
   } catch (error) {
@@ -55,19 +62,8 @@ export async function loadOverlays() {
   }
 }
 
-export function saveOverlays() {
-  {
-    const body = JSON.stringify(highlight_container.innerHTML);
-    fetch('/write/highlights', { method: 'POST', body });
-  }
-  {
-    const marker_data_list = [];
-    for (const marker of marker_set) {
-      marker_data_list.push(marker.data);
-    }
-    const body = JSON.stringify(marker_data_list);
-    fetch('/write/markers', { method: 'POST', body });
-  }
+export function getOverlayMarkers() {
+  return marker_set;
 }
 
 /**

@@ -1,7 +1,10 @@
-import { updateLegends } from './map-legends.js';
-import { loadOverlays } from './map-overlays.js';
-import { getRulerHRect, getRulerVRect, updateRulers } from './map-rulers.js';
+import { getOverlayMarkers } from './map-overlays.js';
 import { NodeRef } from './script/lib/Node_Utility.js';
+
+import { updateLegends } from './map-legends.js';
+import { isOverlayElement, loadOverlays } from './map-overlays.js';
+import { getRulerHRect, getRulerVRect, updateRulers } from './map-rulers.js';
+import { VisualElementEditor } from './script/VisualElementEditor.js';
 import { ZoomController } from './script/ZoomController.js';
 
 loadOverlays();
@@ -17,11 +20,35 @@ const zoomController = new ZoomController(zoomContainer, zoomChild, {
   zoom_delta_function: zoomCurve,
 });
 
+const visualEditor = new VisualElementEditor({
+  editorHandleContainer: zoomContainer,
+  elementContainer: zoomChild,
+  elementContainerCoordinateSpace: zoomController.coordinateSpace,
+});
+
+zoomController.setClickListener((event) => {
+  if (isOverlayElement(event.target)) {
+    visualEditor.selectElement(event.target);
+  } else {
+    visualEditor.deselectElement();
+  }
+});
+
+zoomController.setDragListener((event, delta, consumeEvent) => {
+  if (isOverlayElement(event.target) && visualEditor.isSelected(event.target)) {
+    consumeEvent();
+    visualEditor.moveSelectedElementBy(delta);
+  }
+});
+
 zoomController.setTransformListener((scale, point) => {
   saveSettings({ scale, point });
 
   updateRulers(scale, point);
   updateLegends(10 + getRulerVRect().width, 10 + getRulerHRect().height);
+
+  visualEditor.setScale(1 / scale);
+  visualEditor.updateHandles();
 });
 
 // initialize the controller
@@ -58,4 +85,28 @@ function loadSettings() {
  */
 function saveSettings(data) {
   localStorage.setItem('settings', JSON.stringify(data));
+}
+
+const highlightContainer = NodeRef(document.getElementById('overlay-container-0')).as(SVGElement);
+const saveButton = NodeRef(document.getElementById('save')).as(HTMLButtonElement);
+
+saveButton.addEventListener('click', () => {
+  saveOverlays();
+});
+
+function saveOverlays() {
+  {
+    const clone = NodeRef(highlightContainer.cloneNode(true)).as(SVGElement);
+    for (const element of clone.children) {
+      element.removeAttribute('class');
+    }
+    fetch('/write/highlights', { method: 'POST', body: clone.innerHTML.trim() });
+  }
+  {
+    const marker_data_list = [];
+    for (const marker of getOverlayMarkers()) {
+      marker_data_list.push(marker.getData());
+    }
+    fetch('/write/markers', { method: 'POST', body: JSON.stringify(marker_data_list) });
+  }
 }
