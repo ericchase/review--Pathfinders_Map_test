@@ -117,7 +117,7 @@ export class VisualElementEditor {
    * @param {number} index
    * @this VisualElementEditor
    */
-  moveCornerBy(delta, index) {
+  moveVertexBy(delta, index) {
     delta = scalePoint(this.scale, delta);
 
     if (this.activeElement instanceof SVGPolygonElement) {
@@ -128,6 +128,12 @@ export class VisualElementEditor {
       const point = this.coordinateSpace.childPointToGlobalPoint(this.activeElement, scalePoint(1 / this.scale, this.activeElement.points[index]));
       this.handleList[1 + index].element.style.left = `${point.x - VisualElementEditorHandle.Size / 2}px`;
       this.handleList[1 + index].element.style.top = `${point.y - VisualElementEditorHandle.Size / 2}px`;
+      // update size handle
+      const rect = this.getSelectedElementRect();
+      if (rect) {
+        this.handleList[0].element.style.left = `${rect.x + rect.width + VisualElementEditorHandle.Size}px`;
+        this.handleList[0].element.style.top = `${rect.y + rect.height / 2 - VisualElementEditorHandle.Size / 2}px`;
+      }
     }
   }
 
@@ -228,7 +234,7 @@ export class VisualElementEditor {
       }
       for (let i = 0; i < this.activeElement.points.length; i++) {
         this.handleList[1 + i].show((delta) => {
-          this.moveCornerBy(delta, i);
+          this.moveVertexBy(delta, i);
         });
       }
     }
@@ -238,6 +244,7 @@ export class VisualElementEditor {
   updateHandles() {
     const rect = this.getSelectedElementRect();
     if (rect) {
+      // update size handle
       this.handleList[0].element.style.left = `${rect.x + rect.width + VisualElementEditorHandle.Size}px`;
       this.handleList[0].element.style.top = `${rect.y + rect.height / 2 - VisualElementEditorHandle.Size / 2}px`;
       if (this.activeElement instanceof SVGPolygonElement) {

@@ -33,7 +33,7 @@ zoomController.setClickListener((event) => {
 });
 
 zoomController.setDragListener((event, delta, consumeEvent) => {
-  if (visualEditor.activeElement) {
+  if (isOverlayElement(event.target) && visualEditor.isSelected(event.target)) {
     consumeEvent();
     visualEditor.moveSelectedElementBy(delta);
   }

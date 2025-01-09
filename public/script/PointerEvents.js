@@ -101,6 +101,9 @@ export function setupPointerEvents(element, listeners) {
    */
   function dragHandler(event) {
     element.removeEventListener('pointerup', clickHandler);
+    if (event.target instanceof Element) {
+      event.target.setPointerCapture(event.pointerId);
+    }
     pointersSet(event);
     const dragEnd = { x: event.clientX, y: event.clientY };
     const dragDelta = { x: dragEnd.x - dragStart.x, y: dragEnd.y - dragStart.y };
