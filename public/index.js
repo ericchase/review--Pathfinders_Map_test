@@ -1,12 +1,13 @@
-import { toInt } from './script/CoordinateSpaceContainer.js';
+import { changeSelectedHighlight, dragSelectedHighlight, isHighlight, isSelectedHighlight, setupHighlights } from './highlights-editor.js';
+import { scalePoint, toInt } from './script/CoordinateSpaceContainer.js';
 import { NodeRef } from './script/lib/Node_Utility.js';
 import { ZoomController } from './script/ZoomController.js';
 
-const child = document.getElementById('map');
-const container = document.getElementById('map-container');
+const container = document.getElementById('zoom-container-0');
+const child = document.getElementById('zoom-child-0');
+
 const legend = NodeRef(document.getElementById('legend')).as(HTMLElement);
 const toggle_legend = NodeRef(document.getElementById('toggle-legend')).as(HTMLButtonElement);
-const highlight_container = NodeRef(document.getElementById('highlight-container')).as(SVGElement);
 const ruler_h = NodeRef(document.getElementById('ruler-h')).as(HTMLElement);
 const ruler_v = NodeRef(document.getElementById('ruler-v')).as(HTMLElement);
 
@@ -40,21 +41,18 @@ const zoomController = new ZoomController(container, child, {
 });
 
 // update other elements on drag and zoom
-zoomController.onTransform((scale, point) => {
+zoomController.setTransformListener((scale, point) => {
   saveSettings({ scale, point });
 
-  // move and scale the highlight container
-  highlight_container.style.left = `${point.x}px`;
-  highlight_container.style.top = `${point.y}px`;
-  highlight_container.style.transform = `scale(${scale})`;
-
-  const secondary_scale = Math.min(scale, 0.5);
+  // const secondary_scale = Math.min(scale, 0.5);
 
   // move and scale the rulers
   ruler_h.style.left = `${point.x}px`;
-  ruler_h.style.transform = `scale(${scale},${secondary_scale})`;
+  // ruler_h.style.transform = `scale(${scale},${secondary_scale})`;
+  ruler_h.style.transform = `scale(${scale})`;
   ruler_v.style.top = `${point.y}px`;
-  ruler_v.style.transform = `scale(${secondary_scale},${scale})`;
+  // ruler_v.style.transform = `scale(${secondary_scale},${scale})`;
+  ruler_v.style.transform = `scale(${scale})`;
 
   // move the legend to clear the rulers
   legend.style.left = `${10 + ruler_v.getBoundingClientRect().width}px`;
@@ -62,7 +60,8 @@ zoomController.onTransform((scale, point) => {
 });
 
 // initialize the controller
-zoomController.init();
+zoomController.setupEvents();
+
 if (loaded_settings) {
   zoomController.setTransform(loaded_settings.scale, loaded_settings.point);
 } else {
@@ -82,8 +81,20 @@ toggle_legend.addEventListener('click', () => {
   }
 });
 
-// load highlights
-try {
-  const response = await fetch('./highlights.svg');
-  highlight_container.insertAdjacentHTML('beforeend', await response.text());
-} catch (error) {}
+setupHighlights();
+// setupMarkers();
+
+zoomController.setClickListener((event) => {
+  if (isHighlight(event.target)) {
+    changeSelectedHighlight(event.target);
+  } else {
+    changeSelectedHighlight();
+  }
+});
+zoomController.setDragListener((event, delta, setCapture, consumeEvent) => {
+  if (isSelectedHighlight(event.target)) {
+    consumeEvent();
+    setCapture(event.target);
+    dragSelectedHighlight(scalePoint(1 / zoomController.parse_scale(), delta));
+  }
+});

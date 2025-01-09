@@ -1,5 +1,6 @@
 import { CoordinateSpaceContainer, getDelta, scalePoint, toFloat, toPoint } from './CoordinateSpaceContainer.js';
 import { NodeRef } from './lib/Node_Utility.js';
+import { setupPointerEvents } from './PointerEvents.js';
 
 export class ZoomController {
   /**
@@ -29,24 +30,47 @@ export class ZoomController {
     // setup the coordinate space
     this.coordinateSpace = new CoordinateSpaceContainer(this.container);
     this.coordinateSpace.addChild(this.child);
+
+    // setup window resize event
+    const self = this;
+    let oldContainerRect = self.container.getBoundingClientRect();
+    function onResize() {
+      const newContainerRect = self.container.getBoundingClientRect();
+      // this math took forever
+      // basically, it's getting the centers of the old and new container sizes and
+      // offsetting those distances to the map's left and top values
+      const old_center = toPoint(0.5 * oldContainerRect.width, 0.5 * oldContainerRect.height);
+      const new_center = toPoint(0.5 * newContainerRect.width, 0.5 * newContainerRect.height);
+      self.moveDelta(getDelta(old_center, new_center));
+      oldContainerRect = newContainerRect;
+    }
+    window.addEventListener('resize', onResize);
   }
 
-  // Event Subscriptions
+  // Events
 
   /**
-   * @type {Set<(scale: number, point: { x: number, y: number }) => void>}
-   */
-  transform_subscribers = new Set();
-
-  /**
-   * @param {(scale: number, point: { x: number, y: number }) => void} fn
+   * @param {(event:Event,point:{x:number;y:number;},consumeEvent:()=>void)=>void} fn
    * @this ZoomController
    */
-  onTransform(fn) {
-    this.transform_subscribers.add(fn);
-    return () => {
-      this.transform_subscribers.delete(fn);
-    };
+  setClickListener(fn) {
+    this.onClick = fn;
+  }
+
+  /**
+   * @param {(event:Event,delta:{x:number;y:number;},setCapture:(element:HTMLElement|SVGElement)=>void,consumeEvent:()=>void)=>void} fn
+   * @this ZoomController
+   */
+  setDragListener(fn) {
+    this.onDrag = fn;
+  }
+
+  /**
+   * @param {(scale:number,point:{x:number,y:number})=>void} fn
+   * @this ZoomController
+   */
+  setTransformListener(fn) {
+    this.onTransform = fn;
   }
 
   // Parse Values
@@ -231,141 +255,62 @@ export class ZoomController {
     this.child.style.left = `${clamped_point.x}px`;
     this.child.style.top = `${clamped_point.y}px`;
     this.child.style.transform = `scale(${scale})`;
-    for (const fn of this.transform_subscribers) {
-      fn(scale, clamped_point);
+    if (this.onTransform) {
+      this.onTransform(scale, clamped_point);
     }
   }
 
   /**
    * @this ZoomController
    */
-  init() {
-    SetupZoomControl(this);
+  clearEvents() {
+    if (this.clearPointerEvents) {
+      this.clearPointerEvents();
+      delete this.clearPointerEvents;
+    }
   }
-}
-
-/**
- * @this {void}
- * @param {ZoomController} controller
- */
-function SetupZoomControl(controller) {
-  let isDragging = false;
-  let oldContainerRect = controller.container.getBoundingClientRect();
-
-  controller.setTransform(1, toPoint(0, 0));
-
-  let dragStart = toPoint(0, 0);
-  let pinchStart = 0;
 
   /**
-   * @type {Map<number,{clientX:number, clientY:number}>}
+   * @this ZoomController
    */
-  const pointers = new Map();
-
-  function getPinchCenter() {
-    const [pointer1, pointer2] = [...pointers.values()];
-    // Calculate the center point between the two pointers
-    const x = (pointer1.clientX + pointer2.clientX) / 2;
-    const y = (pointer1.clientY + pointer2.clientY) / 2;
-    return toPoint(x, y);
-  }
-  function getPinchDistance() {
-    const [pointer1, pointer2] = [...pointers.values()];
-    // Calculate the distance between the two pointers (pinch distance)
-    const dx = pointer2.clientX - pointer1.clientX;
-    const dy = pointer2.clientY - pointer1.clientY;
-    return Math.sqrt(dx * dx + dy * dy);
-  }
-
-  controller.container.addEventListener('pointerdown', (event) => {
-    pointers.set(event.pointerId, { clientX: event.clientX, clientY: event.clientY });
-
-    if (event.pointerType === 'mouse') {
-      switch (event.button) {
-        case 1:
-          // middle click
-          // center on point
-          controller.moveDelta(controller.coordinateSpace.deltaGlobalPointToContainerCenter(toPoint(event.clientX, event.clientY)));
-          return;
-        case 2:
-          // right click
-          // do nothing
-          isDragging = false;
-          return;
-      }
-    }
-
-    switch (pointers.size) {
-      case 1:
-        isDragging = true;
-        dragStart = toPoint(event.clientX, event.clientY);
-        controller.child.setPointerCapture(event.pointerId);
-        break;
-      case 2:
-        pinchStart = getPinchDistance();
-        break;
-    }
-  });
-
-  controller.container.addEventListener('pointermove', (event) => {
-    pointers.set(event.pointerId, { clientX: event.clientX, clientY: event.clientY });
-
-    switch (pointers.size) {
-      case 1:
-        if (isDragging) {
-          const dragDistance = toPoint(event.clientX, event.clientY);
-          controller.moveDelta(getDelta(dragStart, dragDistance));
-          dragStart = dragDistance;
+  setupEvents() {
+    const self = this;
+    this.clearPointerEvents = setupPointerEvents(self.container, {
+      onClick(event, point) {
+        self.onClick?.(event, point, () => {});
+      },
+      onContextMenu(event) {
+        event.preventDefault();
+      },
+      onDrag(event, delta, setCapture) {
+        event.preventDefault();
+        let eventConsumed = false;
+        self.onDrag?.(event, delta, setCapture, () => {
+          eventConsumed = true;
+        });
+        if (eventConsumed === false) {
+          setCapture(self.container);
+          self.moveDelta(delta);
         }
-        break;
-      case 2:
-        {
-          event.preventDefault(); // disable default pinch-to-zoom
-          const pinchDistance = getPinchDistance();
-          const deltaPinch = pinchDistance - pinchStart;
-          if (deltaPinch < -1 || deltaPinch > 1) {
-            // use the delta pinch distance to zoom
-            controller.zoomTo(controller.parse_scale() + deltaPinch / 500, getPinchCenter());
-          }
-          pinchStart = getPinchDistance();
+      },
+      onMiddleDown(event, point) {
+        event.preventDefault();
+        self.moveDelta(self.coordinateSpace.deltaGlobalPointToContainerCenter(point));
+      },
+      onPinch(event, delta, center) {
+        event.preventDefault();
+        if (delta < -1 || delta > 1) {
+          self.zoomTo(self.parse_scale() + delta / 500, center);
         }
-        break;
-    }
-  });
-
-  controller.container.addEventListener('pointerup', (event) => {
-    pointers.delete(event.pointerId);
-    isDragging = false;
-  });
-
-  controller.container.addEventListener('pointercancel', (event) => {
-    pointers.delete(event.pointerId);
-    isDragging = false;
-  });
-
-  controller.container.addEventListener('contextmenu', (event) => {
-    event.preventDefault();
-  });
-  controller.container.addEventListener('wheel', (event) => {
-    event.preventDefault();
-    if (event.deltaY < 0) {
-      controller.zoomIn(toPoint(event.clientX, event.clientY));
-    } else if (event.deltaY > 0) {
-      controller.zoomOut(toPoint(event.clientX, event.clientY));
-    }
-  });
-
-  window.addEventListener('resize', () => {
-    const newContainerRect = controller.container.getBoundingClientRect();
-
-    // this math took forever
-    // basically, it's getting the centers of the old and new container sizes and
-    // offsetting those distances to the map's left and top values
-
-    const old_center = toPoint(0.5 * oldContainerRect.width, 0.5 * oldContainerRect.height);
-    const new_center = toPoint(0.5 * newContainerRect.width, 0.5 * newContainerRect.height);
-    controller.moveDelta(getDelta(old_center, new_center));
-
-    oldContainerRect = newContainerRect;
-  });
+      },
+      onScroll(event, delta, point) {
+        event.preventDefault();
+        if (delta < 0) {
+          self.zoomIn(point);
+        } else if (delta > 0) {
+          self.zoomOut(point);
+        }
+      },
+    });
+  }
 }

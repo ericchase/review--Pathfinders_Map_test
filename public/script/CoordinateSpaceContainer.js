@@ -2,20 +2,20 @@ import { CNodeRef, NodeRef } from './lib/Node_Utility.js';
 
 /**
  * @param {string} string
- * @param {number} or_value
+ * @param {number} default_value
  */
-export function toInt(string, or_value) {
+export function toInt(string, default_value) {
   const v = Number.parseInt(string);
-  return Number.isNaN(v) ? or_value : v;
+  return Number.isNaN(v) ? default_value : v;
 }
 
 /**
  * @param {string} string
- * @param {number} or_value
+ * @param {number} default_value
  */
-export function toFloat(string, or_value) {
+export function toFloat(string, default_value) {
   const v = Number.parseFloat(string);
-  return Number.isNaN(v) ? or_value : v;
+  return Number.isNaN(v) ? default_value : v;
 }
 
 /**

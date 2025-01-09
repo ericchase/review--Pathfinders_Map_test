@@ -3,7 +3,8 @@
   overflow: hidden;
   position: relative;
 }
-.zoom-child {
+.zoom-child,
+.zoom-child > * {
   pointer-events: none;
   position: absolute;
   transform-origin: top left;
